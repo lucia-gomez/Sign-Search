@@ -2,12 +2,27 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('button').addEventListener('click', onclick, false)
 
   function onclick() {
-    const input = document.querySelector('input').value
-    const query = input[0] + '/' + input
+    const input = processText(document.querySelector('input').value)
+    const query = queryLifePrint(input)
     document.querySelector('#result').src = 'http://www.lifeprint.com/asl101/pages-signs/' + query
-    // chrome.tabs.query({ currentWindow: true, active: true },
-    //   function (tabs) {
-    //     chrome.tabs.sendMessage(tabs[0].id, 'hi there')
-    //   })
   }
 }, false)
+
+// populate the textfield with the current selected text, if any
+chrome.tabs.executeScript({
+  code: "window.getSelection().toString();"
+}, function (selection) {
+  const input = document.querySelector('input')
+  if (selection && selection.length > 0)
+    input.value = selection[0]
+  else
+    input.value = ''
+});
+
+function processText(query) {
+  return query.toLowerCase().trim()
+}
+
+function queryLifePrint(query) {
+  return query[0] + '/' + query
+}
