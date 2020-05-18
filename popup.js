@@ -1,21 +1,6 @@
 const SOURCES = ['LIFEPRINT']
 const RESULTS = document.getElementById('results');
 
-document.addEventListener('DOMContentLoaded', function () {
-  document.querySelector('button').addEventListener('click', onclick, false)
-  async function onclick() {
-    RESULTS.innerHTML = ''
-    const input = processText(document.querySelector('input').value)
-    for (const source of SOURCES) {
-      const query = getQuery(input, source)
-      await makeRequest(query, source)
-    }
-    console.log(RESULTS.childElementCount)
-    if (RESULTS.childElementCount == 0)
-      noResult()
-  }
-}, false)
-
 // populate the textfield with the current selected text, if any
 chrome.tabs.executeScript({
   code: "window.getSelection().toString();"
@@ -27,6 +12,29 @@ chrome.tabs.executeScript({
     input.value = ''
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelector('button').addEventListener('click', onclick, false)
+  async function onclick() {
+    RESULTS.innerHTML = ''
+    const input = processText(document.querySelector('input').value)
+    for (const source of SOURCES) {
+      const query = getQuery(input, source)
+      try {
+        const response = await makeRequest(getQueryCORSProxy(query), 'document')
+        const images = parseImages(response, source)
+        // TODO: decide how many images to render. just 1 for now
+        for (let i = 0; i < 1; i++) {
+          const img_src = await makeRequest(images[i].src, 'blob')
+          render(img_src)
+        }
+      }
+      catch (err) { }
+    }
+    if (RESULTS.childElementCount == 0)
+      noResult()
+  }
+}, false)
+
 function processText(input) {
   return input.toLowerCase().trim()
 }
@@ -37,37 +45,26 @@ function getQuery(input, source) {
   }
 }
 
-function queryCORSProxy(query) {
+function getQueryCORSProxy(query) {
   // my CORS Anywhere proxy server
   return 'https://peaceful-stream-10554.herokuapp.com/' + query;
 }
 
-async function makeRequest(query, source) {
-  const http = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-  http.open('GET', queryCORSProxy(query), true);
-  http.responseType = 'document'
-  http.onreadystatechange = async function () {
-    if (this.readyState !== 4)
-      return
-    if (this.status !== 200)
-      return
-    else {
-      const images = parseImages(this.response, source)
-      for (let i = 0; i < 1; i++)
-        makeImageRequest(images[i].src)
+async function makeRequest(query, responseType) {
+  const http = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP")
+  return new Promise((resolve, reject) => {
+    http.responseType = responseType
+    http.onreadystatechange = function () {
+      if (this.readyState == 4) {
+        if (this.status == 200)
+          resolve(this.response)
+        else
+          reject('Not found')
+      }
     }
-  };
-  http.send()
-}
-
-function makeImageRequest(img_src) {
-  const http = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-  http.open('GET', img_src);
-  http.responseType = 'blob';
-  http.onload = function (e) {
-    outputContent(this.response)
-  };
-  http.send();
+    http.open('GET', query)
+    http.send()
+  })
 }
 
 function parseImages(response, source) {
@@ -79,11 +76,10 @@ function parseImages(response, source) {
   return []
 }
 
-function outputContent(img_src) {
+function render(img_src) {
   const display = document.createElement('img')
   display.src = window.URL.createObjectURL(img_src);
   RESULTS.appendChild(display)
-  console.log(RESULTS.childElementCount)
 }
 
 function noResult() {
