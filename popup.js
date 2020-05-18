@@ -1,4 +1,5 @@
 const SOURCES = ['LIFEPRINT']
+const SOURCE_DISPLAY_NAME = { 'LIFEPRINT': 'LifePrint' }
 const RESULTS = document.getElementById('results');
 
 // populate the textfield with the current selected text, if any
@@ -21,12 +22,8 @@ document.addEventListener('DOMContentLoaded', function () {
       const query = getQuery(input, source)
       try {
         const response = await makeRequest(getQueryCORSProxy(query), 'document')
-        const images = parseImages(response, source)
-        // TODO: decide how many images to render. just 1 for now
-        for (let i = 0; i < 1; i++) {
-          const img_src = await makeRequest(images[i].src, 'blob')
-          render(img_src)
-        }
+        const media = parseMedia(response, source)
+        await selectAndRenderMedia(media, source, query)
       }
       catch (err) { }
     }
@@ -67,24 +64,61 @@ async function makeRequest(query, responseType) {
   })
 }
 
-function parseImages(response, source) {
+function parseMedia(response, source) {
+  let media = {}
   if (source == 'LIFEPRINT') {
     if (!response.querySelector('blockquote'))
       return
-    return response.querySelector('blockquote').getElementsByTagName("img");
+    media['image'] = []
+    media['gif'] = []
+    for (const img of response.querySelector('blockquote').getElementsByTagName("img")) {
+      const key = img.src.includes('.gif') ? 'gif' : 'image'
+      media[key].push(img)
+    }
+    media['iframe'] = response.querySelector('blockquote').getElementsByTagName("iframe")
   }
-  return []
+  return media
 }
 
-function render(img_src) {
+async function selectAndRenderMedia(media, source, query) {
+  renderSourceName(source, query)
+  if (media['iframe'].length > 0)
+    renderIFrame(media['iframe'][0])
+  if (media['gif'].length > 0) {
+    const img_src = await makeRequest(media['gif'][0].src, 'blob')
+    renderImage(img_src)
+  }
+  // static images as a last resort
+  if (media['iframe'].length == 0 && media['gif'].length == 0) {
+    if (media['image'].length > 0) {
+      const img_src = await makeRequest(media['image'][0].src, 'blob')
+      renderImage(img_src)
+    }
+  }
+}
+
+function renderImage(img_src) {
   const display = document.createElement('img')
   display.src = window.URL.createObjectURL(img_src);
   RESULTS.appendChild(display)
 }
 
+function renderIFrame(iframe) {
+  const display = document.createElement('iframe')
+  display.src = iframe.src
+  RESULTS.appendChild(display)
+}
+
+function renderSourceName(source, query) {
+  const title = document.createElement('a')
+  title.appendChild(document.createTextNode(SOURCE_DISPLAY_NAME[source]))
+  title.href = query
+  title.target = '_blank'
+  RESULTS.appendChild(title)
+}
+
 function noResult() {
   const error = document.createElement('p')
-  const msg = document.createTextNode('No results')
-  error.appendChild(msg)
+  error.appendChild(document.createTextNode('No results'))
   RESULTS.appendChild(error)
 }

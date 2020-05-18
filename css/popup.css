@@ -1,0 +1,25 @@
+body {
+  width: max-content;
+}
+
+.form {
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+}
+
+#results {
+  display: flex;
+  flex-direction: column;
+  max-height: 500px;
+}
+
+img {
+  width: 300px;
+  height: auto;
+}
+
+iframe {
+  width: 300px;
+  height: auto;
+}
