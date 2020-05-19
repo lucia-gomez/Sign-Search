@@ -1,5 +1,5 @@
-const SOURCES = ['LIFEPRINT']
-const SOURCE_DISPLAY_NAME = { 'LIFEPRINT': 'Lifeprint' }
+const SOURCES = ['SPREADTHESIGN', 'LIFEPRINT']
+const SOURCE_DISPLAY_NAME = { 'LIFEPRINT': 'Lifeprint', 'SPREADTHESIGN': 'Spread the Sign' }
 const RESULTS = document.getElementById('results');
 
 // populate the textfield with the current selected text, if any
@@ -40,6 +40,8 @@ function processText(input) {
 function getQuery(input, source) {
   if (source == 'LIFEPRINT')
     return 'http://www.lifeprint.com/asl101/pages-signs/' + input[0] + '/' + input
+  else if (source == 'SPREADTHESIGN')
+    return 'https://www.spreadthesign.com/en.us/search/?q=' + input
 }
 
 function getQueryCORSProxy(query) {
@@ -65,24 +67,26 @@ async function makeRequest(query, responseType) {
 }
 
 function parseMedia(response, source) {
-  let media = {}
+  let media = { 'video': [], 'image': [], 'gif': [], 'iframe': [] }
   if (source == 'LIFEPRINT') {
     if (!response.querySelector('blockquote'))
       return
-    media['image'] = []
-    media['gif'] = []
     for (const img of response.querySelector('blockquote').getElementsByTagName("img")) {
       const key = img.src.includes('.gif') ? 'gif' : 'image'
       media[key].push(img)
     }
     media['iframe'] = response.querySelector('blockquote').getElementsByTagName("iframe")
+  } else if (source == 'SPREADTHESIGN') {
+    media['video'] = response.getElementsByTagName('video')
+    console.log('num videos', media['video'])
   }
   return media
 }
 
 async function selectAndRenderMedia(media, source, query) {
-  // renderSourceName(source, query)
   let children = []
+  if (media['video'].length > 0)
+    children.push(renderVideo(media['video'][0]))
   if (media['iframe'].length > 0)
     children.push(renderIFrame(media['iframe'][0]))
   if (media['gif'].length > 0) {
@@ -122,6 +126,15 @@ function renderIFrame(iframe) {
   return display
 }
 
+function renderVideo(video) {
+  const display = document.createElement('video')
+  display.src = video.src
+  display.autoplay = true;
+  display.loop = true;
+  display.muted = true;
+  return display
+}
+
 function renderSourceName(source, query) {
   const title = document.createElement('a')
   title.appendChild(document.createTextNode('View on ' + SOURCE_DISPLAY_NAME[source]))
@@ -133,5 +146,6 @@ function renderSourceName(source, query) {
 function noResult() {
   const error = document.createElement('p')
   error.appendChild(document.createTextNode('No results'))
+  error.id = 'no-results'
   RESULTS.appendChild(error)
 }
