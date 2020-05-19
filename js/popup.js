@@ -1,5 +1,5 @@
 const SOURCES = ['LIFEPRINT']
-const SOURCE_DISPLAY_NAME = { 'LIFEPRINT': 'LifePrint' }
+const SOURCE_DISPLAY_NAME = { 'LIFEPRINT': 'Lifeprint' }
 const RESULTS = document.getElementById('results');
 
 // populate the textfield with the current selected text, if any
@@ -33,13 +33,13 @@ document.addEventListener('DOMContentLoaded', function () {
 }, false)
 
 function processText(input) {
+  // TODO: stemming or lemmatization?
   return input.toLowerCase().trim()
 }
 
 function getQuery(input, source) {
-  if (source == 'LIFEPRINT') {
+  if (source == 'LIFEPRINT')
     return 'http://www.lifeprint.com/asl101/pages-signs/' + input[0] + '/' + input
-  }
 }
 
 function getQueryCORSProxy(query) {
@@ -81,40 +81,53 @@ function parseMedia(response, source) {
 }
 
 async function selectAndRenderMedia(media, source, query) {
-  renderSourceName(source, query)
+  // renderSourceName(source, query)
+  let children = []
   if (media['iframe'].length > 0)
-    renderIFrame(media['iframe'][0])
+    children.push(renderIFrame(media['iframe'][0]))
   if (media['gif'].length > 0) {
     const img_src = await makeRequest(media['gif'][0].src, 'blob')
-    renderImage(img_src)
+    children.push(renderImage(img_src))
   }
   // static images as a last resort
   if (media['iframe'].length == 0 && media['gif'].length == 0) {
     if (media['image'].length > 0) {
       const img_src = await makeRequest(media['image'][0].src, 'blob')
-      renderImage(img_src)
+      children.push(renderImage(img_src))
     }
   }
+
+  if (children.length > 0)
+    renderResultSection(source, query, children)
+}
+
+function renderResultSection(source, query, children) {
+  const section = document.createElement('section')
+  section.appendChild(renderSourceName(source, query))
+  children.forEach(child => {
+    section.appendChild(child)
+  });
+  RESULTS.appendChild(section)
 }
 
 function renderImage(img_src) {
   const display = document.createElement('img')
   display.src = window.URL.createObjectURL(img_src);
-  RESULTS.appendChild(display)
+  return display
 }
 
 function renderIFrame(iframe) {
   const display = document.createElement('iframe')
   display.src = iframe.src
-  RESULTS.appendChild(display)
+  return display
 }
 
 function renderSourceName(source, query) {
   const title = document.createElement('a')
-  title.appendChild(document.createTextNode(SOURCE_DISPLAY_NAME[source]))
+  title.appendChild(document.createTextNode('View on ' + SOURCE_DISPLAY_NAME[source]))
   title.href = query
   title.target = '_blank'
-  RESULTS.appendChild(title)
+  return title
 }
 
 function noResult() {

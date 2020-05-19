@@ -1,0 +1,55 @@
+$color: #753cbf;
+$light-color: #b69ed6;
+$popup-width: 350px;
+$padding: 5px;
+
+body {
+  width: $popup-width;
+}
+
+.flex-right {
+  display: flex;
+  flex-direction: row;
+  padding: $padding;
+}
+
+h3 {
+  color: $color;
+  font-size: 20px;
+  font-weight: 500;
+  margin: auto 0px;
+  padding-right: 10px;
+}
+
+button {
+  background-color: $color;
+  color: white;
+}
+
+#results {
+  display: flex;
+  flex-direction: column;
+  max-height: 500px;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: $light-color;
+  padding: $padding;
+  text-align: right;
+  width: max-content;
+}
+
+a:hover {
+  color: $color;
+}
+
+iframe, img {
+  width: $popup-width;
+  height: auto;
+  padding: $padding;
+}
