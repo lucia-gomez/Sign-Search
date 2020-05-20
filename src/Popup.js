@@ -7,7 +7,9 @@ import ResultSection from './js/result-section';
 import ResultImage from './js/result-image';
 import ResultVideo from './js/result-video';
 import ResultIFrame from './js/result-iframe';
+import Button from 'react-bootstrap/Button';
 
+import './css/bootstrap.min.css'
 import './css/popup.css';
 
 function Popup() {
@@ -16,7 +18,8 @@ function Popup() {
       <div class='flex-right'>
         <h3>Sign Search</h3>
         <input type='text' placeholder="Ex: dog" />
-        <button type="button" class="btn btn-sm">Go</button>
+        <Button variant="primary" size="sm">Go</Button>
+        {/* <button type="button" class="btn btn-sm">Go</button> */}
       </div>
       <div id='container' />
     </div>

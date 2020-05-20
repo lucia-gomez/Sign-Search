@@ -1,10 +1,14 @@
 $color: #753cbf;
 $light-color: #b69ed6;
 $popup-width: 350px;
-$padding: 5px 0px;
+$padding: 5px;
 
 body {
   width: $popup-width;
+}
+
+.container {
+  padding: 10px;
 }
 
 .flex-right {
@@ -21,26 +25,32 @@ h3 {
   padding-right: 10px;
 }
 
-button {
+.btn {
   background-color: $color;
+  border: none;
   color: white;
+}
+
+.btn:hover {
+  background-color: $color;
 }
 
 #results {
   display: flex;
   flex-direction: column;
   max-height: 500px;
+  padding: $padding;
 }
 
 section {
   display: flex;
   flex-direction: column;
-  padding-bottom: 20px;
+  padding: 10px 0px;
 }
 
 a {
   color: $light-color;
-  padding: $padding;
+  padding-bottom: $padding;
   text-align: right;
   width: max-content;
 }
@@ -50,11 +60,14 @@ a:hover {
 }
 
 iframe, img {
-  width: $popup-width;
+  width: calc(#{$popup-width} - 2*#{$padding});
   height: auto;
-  padding: $padding;
 }
 
 video {
   object-fit: cover;
+}
+
+.spinner-border {
+  color: $color;
 }

@@ -1,5 +1,6 @@
 /* eslint-disable import/first */
 import React from 'react';
+import Spinner from 'react-bootstrap/Spinner'
 
 class ResultList extends React.Component {
   constructor(props) {
@@ -26,7 +27,7 @@ class ResultList extends React.Component {
   }
 
   render() {
-    const spinner = <p>Loading...</p>
+    const spinner = <Spinner animation="border" role="status" />
     const text = <p id='no-results'>No results</p>
     return (
       <div id='results'>
