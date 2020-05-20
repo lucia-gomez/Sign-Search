@@ -2,11 +2,13 @@
 /* global ActiveXObject */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './css/popup.css';
 import ResultList from './js/result-list';
 import ResultSection from './js/result-section';
 import ResultImage from './js/result-image';
 import ResultVideo from './js/result-video';
+import ResultIFrame from './js/result-iframe';
+
+import './css/popup.css';
 
 function Popup() {
   return (
@@ -21,8 +23,16 @@ function Popup() {
   );
 }
 
-const SOURCES = ['SPREADTHESIGN', 'LIFEPRINT']
-const SOURCE_DISPLAY_NAME = { 'LIFEPRINT': 'Lifeprint', 'SPREADTHESIGN': 'Spread the Sign' }
+const SOURCES = Object.freeze({
+  SPREAD_THE_SIGN: 'Spread the Sign',
+  LIFEPRINT: 'Lifeprint'
+})
+const MEDIA_TYPE = Object.freeze({
+  GIF: 0,
+  IFRAME: 1,
+  IMAGE: 2,
+  VIDEO: 3,
+})
 
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('button').addEventListener('click', onclick, false)
@@ -33,7 +43,8 @@ document.addEventListener('DOMContentLoaded', function () {
     )
     results.reset()
     const input = processText(document.querySelector('input').value)
-    for (const source of SOURCES) {
+
+    for (const source of Object.values(SOURCES)) {
       const query = getQuery(input, source)
       try {
         const response = await makeRequest(getQueryCORSProxy(query), 'document')
@@ -42,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       catch (err) { }
     }
+
     results.finishedLoading()
   }
 }, false)
@@ -62,10 +74,14 @@ function processText(input) {
 }
 
 function getQuery(input, source) {
-  if (source === 'LIFEPRINT')
-    return 'http://www.lifeprint.com/asl101/pages-signs/' + input[0] + '/' + input
-  else if (source === 'SPREADTHESIGN')
-    return 'https://www.spreadthesign.com/en.us/search/?q=' + input
+  switch (source) {
+    case SOURCES.LIFEPRINT:
+      return 'http://www.lifeprint.com/asl101/pages-signs/' + input[0] + '/' + input
+    case SOURCES.SPREAD_THE_SIGN:
+      return 'https://www.spreadthesign.com/en.us/search/?q=' + input
+    default:
+      return ''
+  }
 }
 
 function getQueryCORSProxy(query) {
@@ -91,61 +107,69 @@ async function makeRequest(query, responseType) {
   })
 }
 
+// pull media from webpages
+// returns: dict<MEDIA_TYPE.value, [Element]>
 function parseMedia(response, source) {
-  let media = { 'video': [], 'image': [], 'gif': [], 'iframe': [] }
-  if (source === 'LIFEPRINT') {
-    if (!response.querySelector('blockquote'))
-      return
-    for (const img of response.querySelector('blockquote').getElementsByTagName("img")) {
-      const key = img.src.includes('.gif') ? 'gif' : 'image'
-      media[key].push(img)
-    }
-    media['iframe'] = response.querySelector('blockquote').getElementsByTagName("iframe")
-  } else if (source === 'SPREADTHESIGN') {
-    media['video'] = response.getElementsByTagName('video')
+  const media = {}
+  Object.values(MEDIA_TYPE).forEach(type => {
+    media[type] = []
+  })
+  switch (source) {
+    case SOURCES.LIFEPRINT:
+      if (!response.querySelector('blockquote'))
+        break;
+      const imgs = response.querySelector('blockquote').getElementsByTagName("img")
+      for (const img of imgs) {
+        const key = img.src.includes('.gif') ? MEDIA_TYPE.GIF : MEDIA_TYPE.IMAGE
+        media[key].push(img)
+      }
+      media[MEDIA_TYPE.IFRAME] = response.querySelector('blockquote').getElementsByTagName("iframe")
+      break;
+
+    case SOURCES.SPREAD_THE_SIGN:
+      media[MEDIA_TYPE.VIDEO] = response.getElementsByTagName('video')
+      break;
+    default:
   }
   return media
 }
 
 async function selectAndRenderMedia(media, source, query, results) {
-  let children = []
-  if (media['video'].length > 0)
-    children.push(renderVideo(media['video'][0]))
-  // if (media['iframe'].length > 0)
-  //   children.push(renderIFrame(media['iframe'][0]))
-  if (media['gif'].length > 0) {
-    const img_src = await makeRequest(media['gif'][0].src, 'blob')
+  const children = []
+  let hasVideo = false, hasGif = false
+  if (media[MEDIA_TYPE.VIDEO].length > 0) {
+    const src = media[MEDIA_TYPE.VIDEO][0].src
+    children.push(<ResultVideo src={src} />)
+    hasVideo = true
+  }
+  if (media[MEDIA_TYPE.IFRAME].length > 0) {
+    const src = media[MEDIA_TYPE.IFRAME][0].src
+    children.push(<ResultIFrame src={src} />)
+    hasVideo = true
+  }
+  if (media[MEDIA_TYPE.GIF].length > 0) {
+    const img_src = await makeRequest(media[MEDIA_TYPE.GIF][0].src, 'blob')
     children.push(renderImage(img_src))
+    hasGif = true
   }
   // static images as a last resort
-  if (media['iframe'].length === 0 && media['gif'].length === 0) {
-    if (media['image'].length > 0) {
-      const img_src = await makeRequest(media['image'][0].src, 'blob')
+  if (!(hasVideo || hasGif)) {
+    if (media[MEDIA_TYPE.IMAGE].length > 0) {
+      const img_src = await makeRequest(media[MEDIA_TYPE.IMAGE][0].src, 'blob')
       children.push(renderImage(img_src))
     }
   }
-
   if (children.length > 0)
     renderResultSection(source, query, children, results)
 }
 
 function renderResultSection(source, query, children, results) {
-  const section = <ResultSection title={SOURCE_DISPLAY_NAME[source]} link={query}>{children}</ResultSection>
+  const section = <ResultSection title={source} link={query}>{children}</ResultSection>
   results.addChild(section)
 }
 
 function renderImage(img_src) {
   return <ResultImage src={window.URL.createObjectURL(img_src)} />
-}
-
-function renderIFrame(iframe) {
-  const display = document.createElement('iframe')
-  display.src = iframe.src
-  return display
-}
-
-function renderVideo(video) {
-  return <ResultVideo src={video.src} />
 }
 
 export default Popup;
