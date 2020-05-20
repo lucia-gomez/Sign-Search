@@ -4,7 +4,7 @@ body {
 .flex-right {
   display: flex;
   flex-direction: row;
-  padding: 5px; }
+  padding: 5px 0px; }
 
 h3 {
   color: #753cbf;
@@ -24,11 +24,12 @@ button {
 
 section {
   display: flex;
-  flex-direction: column; }
+  flex-direction: column;
+  padding-bottom: 20px; }
 
 a {
   color: #b69ed6;
-  padding: 5px;
+  padding: 5px 0px;
   text-align: right;
   width: max-content; }
 
@@ -38,9 +39,9 @@ a:hover {
 iframe, img {
   width: 350px;
   height: auto;
-  padding: 5px; }
+  padding: 5px 0px; }
 
-#no-results {
-  padding: 5px; }
+video {
+  object-fit: cover; }
 
 /*# sourceMappingURL=popup.css.map */

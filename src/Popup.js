@@ -1,8 +1,51 @@
+/* global chrome */
+/* global ActiveXObject */
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './css/popup.css';
+import ResultList from './js/result-list';
+import ResultSection from './js/result-section';
+import ResultImage from './js/result-image';
+import ResultVideo from './js/result-video';
+
+function Popup() {
+  return (
+    <div className="App">
+      <div class='flex-right'>
+        <h3>Sign Search</h3>
+        <input type='text' placeholder="Ex: dog" />
+        <button type="button" class="btn btn-sm">Go</button>
+      </div>
+      <div id='container' />
+    </div>
+  );
+}
+
 const SOURCES = ['SPREADTHESIGN', 'LIFEPRINT']
 const SOURCE_DISPLAY_NAME = { 'LIFEPRINT': 'Lifeprint', 'SPREADTHESIGN': 'Spread the Sign' }
-const RESULTS = document.getElementById('results');
 
-// populate the textfield with the current selected text, if any
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelector('button').addEventListener('click', onclick, false)
+  async function onclick() {
+    const results = ReactDOM.render(
+      <ResultList />,
+      document.getElementById('container')
+    )
+    results.reset()
+    const input = processText(document.querySelector('input').value)
+    for (const source of SOURCES) {
+      const query = getQuery(input, source)
+      try {
+        const response = await makeRequest(getQueryCORSProxy(query), 'document')
+        const media = parseMedia(response, source)
+        await selectAndRenderMedia(media, source, query, results)
+      }
+      catch (err) { }
+    }
+    results.finishedLoading()
+  }
+}, false)
+
 chrome.tabs.executeScript({
   code: "window.getSelection().toString();"
 }, function (selection) {
@@ -13,34 +56,15 @@ chrome.tabs.executeScript({
     input.value = ''
 });
 
-document.addEventListener('DOMContentLoaded', function () {
-  document.querySelector('button').addEventListener('click', onclick, false)
-  async function onclick() {
-    RESULTS.innerHTML = ''
-    const input = processText(document.querySelector('input').value)
-    for (const source of SOURCES) {
-      const query = getQuery(input, source)
-      try {
-        const response = await makeRequest(getQueryCORSProxy(query), 'document')
-        const media = parseMedia(response, source)
-        await selectAndRenderMedia(media, source, query)
-      }
-      catch (err) { }
-    }
-    if (RESULTS.childElementCount == 0)
-      noResult()
-  }
-}, false)
-
 function processText(input) {
   // TODO: stemming or lemmatization?
   return input.toLowerCase().trim()
 }
 
 function getQuery(input, source) {
-  if (source == 'LIFEPRINT')
+  if (source === 'LIFEPRINT')
     return 'http://www.lifeprint.com/asl101/pages-signs/' + input[0] + '/' + input
-  else if (source == 'SPREADTHESIGN')
+  else if (source === 'SPREADTHESIGN')
     return 'https://www.spreadthesign.com/en.us/search/?q=' + input
 }
 
@@ -54,21 +78,22 @@ async function makeRequest(query, responseType) {
   return new Promise((resolve, reject) => {
     http.responseType = responseType
     http.onreadystatechange = function () {
-      if (this.readyState == 4) {
-        if (this.status == 200)
+      if (this.readyState === 4) {
+        if (this.status === 200)
           resolve(this.response)
         else
           reject('Not found')
       }
     }
     http.open('GET', query)
+    http.setRequestHeader("X-Requested-With", "XMLHttpRequest")
     http.send()
   })
 }
 
 function parseMedia(response, source) {
   let media = { 'video': [], 'image': [], 'gif': [], 'iframe': [] }
-  if (source == 'LIFEPRINT') {
+  if (source === 'LIFEPRINT') {
     if (!response.querySelector('blockquote'))
       return
     for (const img of response.querySelector('blockquote').getElementsByTagName("img")) {
@@ -76,25 +101,24 @@ function parseMedia(response, source) {
       media[key].push(img)
     }
     media['iframe'] = response.querySelector('blockquote').getElementsByTagName("iframe")
-  } else if (source == 'SPREADTHESIGN') {
+  } else if (source === 'SPREADTHESIGN') {
     media['video'] = response.getElementsByTagName('video')
-    console.log('num videos', media['video'])
   }
   return media
 }
 
-async function selectAndRenderMedia(media, source, query) {
+async function selectAndRenderMedia(media, source, query, results) {
   let children = []
   if (media['video'].length > 0)
     children.push(renderVideo(media['video'][0]))
-  if (media['iframe'].length > 0)
-    children.push(renderIFrame(media['iframe'][0]))
+  // if (media['iframe'].length > 0)
+  //   children.push(renderIFrame(media['iframe'][0]))
   if (media['gif'].length > 0) {
     const img_src = await makeRequest(media['gif'][0].src, 'blob')
     children.push(renderImage(img_src))
   }
   // static images as a last resort
-  if (media['iframe'].length == 0 && media['gif'].length == 0) {
+  if (media['iframe'].length === 0 && media['gif'].length === 0) {
     if (media['image'].length > 0) {
       const img_src = await makeRequest(media['image'][0].src, 'blob')
       children.push(renderImage(img_src))
@@ -102,22 +126,16 @@ async function selectAndRenderMedia(media, source, query) {
   }
 
   if (children.length > 0)
-    renderResultSection(source, query, children)
+    renderResultSection(source, query, children, results)
 }
 
-function renderResultSection(source, query, children) {
-  const section = document.createElement('section')
-  section.appendChild(renderSourceName(source, query))
-  children.forEach(child => {
-    section.appendChild(child)
-  });
-  RESULTS.appendChild(section)
+function renderResultSection(source, query, children, results) {
+  const section = <ResultSection title={SOURCE_DISPLAY_NAME[source]} link={query}>{children}</ResultSection>
+  results.addChild(section)
 }
 
 function renderImage(img_src) {
-  const display = document.createElement('img')
-  display.src = window.URL.createObjectURL(img_src);
-  return display
+  return <ResultImage src={window.URL.createObjectURL(img_src)} />
 }
 
 function renderIFrame(iframe) {
@@ -127,25 +145,7 @@ function renderIFrame(iframe) {
 }
 
 function renderVideo(video) {
-  const display = document.createElement('video')
-  display.src = video.src
-  display.autoplay = true;
-  display.loop = true;
-  display.muted = true;
-  return display
+  return <ResultVideo src={video.src} />
 }
 
-function renderSourceName(source, query) {
-  const title = document.createElement('a')
-  title.appendChild(document.createTextNode('View on ' + SOURCE_DISPLAY_NAME[source]))
-  title.href = query
-  title.target = '_blank'
-  return title
-}
-
-function noResult() {
-  const error = document.createElement('p')
-  error.appendChild(document.createTextNode('No results'))
-  error.id = 'no-results'
-  RESULTS.appendChild(error)
-}
+export default Popup;
