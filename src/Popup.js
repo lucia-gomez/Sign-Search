@@ -19,7 +19,6 @@ function Popup() {
         <h3>Sign Search</h3>
         <input type='text' placeholder="Ex: dog" />
         <Button variant="primary" size="sm">Go</Button>
-        {/* <button type="button" class="btn btn-sm">Go</button> */}
       </div>
       <div id='container' />
     </div>
@@ -56,7 +55,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       catch (err) { }
     }
-
     results.finishedLoading()
   }
 }, false)

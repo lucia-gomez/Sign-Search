@@ -14,6 +14,7 @@ body {
 .flex-right {
   display: flex;
   flex-direction: row;
+  justify-content: center;
   padding: $padding;
 }
 
@@ -31,7 +32,7 @@ h3 {
   color: white;
 }
 
-.btn:hover {
+.btn:hover, .btn:active, .btn:focus {
   background-color: $color;
 }
 
@@ -70,4 +71,16 @@ video {
 
 .spinner-border {
   color: $color;
+  margin: auto;
+}
+
+#spinner {
+  filter: hue-rotate(-40deg);
+  width: 100px;
+  margin: auto;
+}
+
+#no-results {
+  margin: 0px;
+  text-align: center;
 }

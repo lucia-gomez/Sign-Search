@@ -10,7 +10,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 /* eslint-disable import/first */
 import React from 'react';
-import Spinner from 'react-bootstrap/Spinner';
+import HandGIF from '../assets/hand-loop.gif';
 
 var ResultList = function (_React$Component) {
   _inherits(ResultList, _React$Component);
@@ -51,7 +51,7 @@ var ResultList = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var spinner = React.createElement(Spinner, { animation: 'border', role: 'status' });
+      var spinner = React.createElement('img', { id: 'spinner', src: HandGIF, style: { width: '100px' } });
       var text = React.createElement(
         'p',
         { id: 'no-results' },

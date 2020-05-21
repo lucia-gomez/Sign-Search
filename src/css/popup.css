@@ -7,6 +7,7 @@ body {
 .flex-right {
   display: flex;
   flex-direction: row;
+  justify-content: center;
   padding: 5px; }
 
 h3 {
@@ -21,7 +22,7 @@ h3 {
   border: none;
   color: white; }
 
-.btn:hover {
+.btn:hover, .btn:active, .btn:focus {
   background-color: #753cbf; }
 
 #results {
@@ -52,6 +53,16 @@ video {
   object-fit: cover; }
 
 .spinner-border {
-  color: #753cbf; }
+  color: #753cbf;
+  margin: auto; }
+
+#spinner {
+  filter: hue-rotate(-40deg);
+  width: 100px;
+  margin: auto; }
+
+#no-results {
+  margin: 0px;
+  text-align: center; }
 
 /*# sourceMappingURL=popup.css.map */

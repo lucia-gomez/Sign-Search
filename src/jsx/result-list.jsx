@@ -1,6 +1,6 @@
 /* eslint-disable import/first */
 import React from 'react';
-import Spinner from 'react-bootstrap/Spinner'
+import HandGIF from '../assets/hand-loop.gif'
 
 class ResultList extends React.Component {
   constructor(props) {
@@ -27,7 +27,7 @@ class ResultList extends React.Component {
   }
 
   render() {
-    const spinner = <Spinner animation="border" role="status" />
+    const spinner = <img id='spinner' src={HandGIF} style={{ width: '100px' }} />
     const text = <p id='no-results'>No results</p>
     return (
       <div id='results'>
