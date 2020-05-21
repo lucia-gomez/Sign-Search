@@ -37,16 +37,18 @@ h3 {
 }
 
 #results {
+  box-sizing: content-box;
   display: flex;
   flex-direction: column;
   max-height: 500px;
+  overflow-y: auto;
   padding: $padding;
 }
 
 section {
   display: flex;
   flex-direction: column;
-  padding: 10px 0px;
+  padding-top: 20px;
 }
 
 a {
@@ -61,17 +63,12 @@ a:hover {
 }
 
 iframe, img {
-  width: calc(#{$popup-width} - 2*#{$padding});
+  width: 100%;
   height: auto;
 }
 
 video {
   object-fit: cover;
-}
-
-.spinner-border {
-  color: $color;
-  margin: auto;
 }
 
 #spinner {
@@ -83,4 +80,10 @@ video {
 #no-results {
   margin: 0px;
   text-align: center;
+}
+
+#history-btn {
+  background-color: $light-color;
+  border-radius: 0px;
+  width: 100%;
 }

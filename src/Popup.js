@@ -8,6 +8,7 @@ import ResultImage from './js/result-image';
 import ResultVideo from './js/result-video';
 import ResultIFrame from './js/result-iframe';
 import Button from 'react-bootstrap/Button';
+import History from './js/history';
 
 import './css/bootstrap.min.css'
 import './css/popup.css';
@@ -20,7 +21,8 @@ function Popup() {
         <input type='text' placeholder="Ex: dog" />
         <Button variant="primary" size="sm">Go</Button>
       </div>
-      <div id='container' />
+      <div id='container'></div>
+      <div id='history' />
     </div>
   );
 }
@@ -37,6 +39,10 @@ const MEDIA_TYPE = Object.freeze({
 })
 
 document.addEventListener('DOMContentLoaded', function () {
+  const history = ReactDOM.render(
+    <History />,
+    document.getElementById('history')
+  )
   document.querySelector('button').addEventListener('click', onclick, false)
   async function onclick() {
     const results = ReactDOM.render(
