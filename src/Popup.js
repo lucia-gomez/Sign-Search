@@ -108,6 +108,18 @@ async function makeRequest(query, responseType) {
   })
 }
 
+function lifeprintExclude(src) {
+  const exclude = [
+    "images-layout/next.gif",
+    "images-layout/concepts.gif",
+    "images-layout/back.gif"]
+  for (const ex of exclude) {
+    if (src.includes(ex))
+      return true
+  }
+  return false
+}
+
 // pull media from webpages
 // returns: dict<MEDIA_TYPE.value, [Element]>
 function parseMedia(response, source) {
@@ -122,7 +134,8 @@ function parseMedia(response, source) {
       const imgs = response.querySelector('blockquote').getElementsByTagName("img")
       for (const img of imgs) {
         const key = img.src.includes('.gif') ? MEDIA_TYPE.GIF : MEDIA_TYPE.IMAGE
-        media[key].push(img)
+        if (!lifeprintExclude(img.src))
+          media[key].push(img)
       }
       media[MEDIA_TYPE.IFRAME] = response.querySelector('blockquote').getElementsByTagName("iframe")
       break;
