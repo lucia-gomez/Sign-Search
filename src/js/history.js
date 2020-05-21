@@ -16,6 +16,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /* global chrome */
 import React from 'react';
 import Button from 'react-bootstrap/Button';
+import ListGroup from 'react-bootstrap/ListGroup';
+import { search } from '../search.js';
 
 var History = function (_React$Component) {
   _inherits(History, _React$Component);
@@ -28,7 +30,9 @@ var History = function (_React$Component) {
     _this.key = 'search_history';
     _this.maxLength = 100;
     _this.numDisplay = 5;
-    _this.state = {};
+    _this.state = { open: false, searches: [] };
+    _this.click = _this.click.bind(_this);
+    _this.search = search;
     _this.init();
     return _this;
   }
@@ -110,12 +114,116 @@ var History = function (_React$Component) {
       return add;
     }()
   }, {
+    key: 'getSearchesToView',
+    value: function () {
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee3() {
+        var hist;
+        return _regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
+                return this.get();
+
+              case 2:
+                hist = _context3.sent;
+                return _context3.abrupt('return', hist.slice(Math.max(hist.length - this.numDisplay, 0)).reverse());
+
+              case 4:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function getSearchesToView() {
+        return _ref3.apply(this, arguments);
+      }
+
+      return getSearchesToView;
+    }()
+  }, {
+    key: 'click',
+    value: function () {
+      var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee4() {
+        var newSearches;
+        return _regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                if (!this.state.open) {
+                  _context4.next = 4;
+                  break;
+                }
+
+                _context4.t0 = this.state.searches;
+                _context4.next = 7;
+                break;
+
+              case 4:
+                _context4.next = 6;
+                return this.getSearchesToView();
+
+              case 6:
+                _context4.t0 = _context4.sent;
+
+              case 7:
+                newSearches = _context4.t0;
+
+                this.setState(function (prevState) {
+                  return {
+                    open: !prevState.open,
+                    searches: newSearches
+                  };
+                });
+
+              case 9:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function click() {
+        return _ref4.apply(this, arguments);
+      }
+
+      return click;
+    }()
+  }, {
+    key: 'close',
+    value: function close() {
+      this.setState({ open: false });
+    }
+  }, {
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
       return React.createElement(
-        Button,
-        { id: 'history-btn' },
-        'History'
+        'div',
+        null,
+        React.createElement(
+          Button,
+          { id: 'history-btn', onClick: this.click },
+          'History'
+        ),
+        this.state.open ? React.createElement(
+          ListGroup,
+          null,
+          this.state.searches.map(function (search, key) {
+            return React.createElement(
+              ListGroup.Item,
+              { key: key, onClick: function onClick() {
+                  document.querySelector('input').value = search;
+                  _this2.search(_this2);
+                } },
+              search
+            );
+          })
+        ) : null
       );
     }
   }]);

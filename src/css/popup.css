@@ -68,4 +68,10 @@ video {
   border-radius: 0px;
   width: 100%; }
 
+.list-group {
+  border-radius: 0px; }
+
+.list-group-item {
+  padding: 5px; }
+
 /*# sourceMappingURL=popup.css.map */

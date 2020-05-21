@@ -2,6 +2,8 @@
 /* global chrome */
 import React from 'react'
 import Button from 'react-bootstrap/Button';
+import ListGroup from 'react-bootstrap/ListGroup'
+import { search } from '../search.js';
 
 class History extends React.Component {
   constructor(props) {
@@ -9,7 +11,9 @@ class History extends React.Component {
     this.key = 'search_history'
     this.maxLength = 100
     this.numDisplay = 5
-    this.state = {}
+    this.state = { open: false, searches: [] }
+    this.click = this.click.bind(this)
+    this.search = search
     this.init()
   }
 
@@ -38,9 +42,37 @@ class History extends React.Component {
     chrome.storage.local.set({ [this.key]: hist })
   }
 
+  async getSearchesToView() {
+    const hist = await this.get()
+    return hist.slice(Math.max(hist.length - this.numDisplay, 0)).reverse()
+  }
+
+  async click() {
+    const newSearches = this.state.open ? this.state.searches : await this.getSearchesToView()
+    this.setState(prevState => ({
+      open: !prevState.open,
+      searches: newSearches
+    }))
+  }
+
+  close() {
+    this.setState({ open: false })
+  }
+
   render() {
     return (
-      <Button id='history-btn'>History</Button>
+      <div>
+        <Button id='history-btn' onClick={this.click}>History</Button>
+        {this.state.open ?
+          <ListGroup>
+            {this.state.searches.map((search, key) => (
+              <ListGroup.Item key={key} onClick={() => {
+                document.querySelector('input').value = search;
+                this.search(this);
+              }}>{search}</ListGroup.Item>
+            ))}
+          </ListGroup> : null}
+      </div>
     )
   }
 }
