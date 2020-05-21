@@ -7,6 +7,7 @@
     "default_popup": "index.html"
   },
   "permissions": [
+    "storage",
     "*://*/*"
   ],
   "content_security_policy": "script-src 'self' 'sha256-++srhNhFSKT0plG5tCc3J+LaJu4d/KvNNRW+tg3sFJ8='; object-src 'self'",

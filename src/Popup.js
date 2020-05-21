@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
       catch (err) { }
     }
     results.finishedLoading()
+    history.add(input)
   }
 }, false)
 
