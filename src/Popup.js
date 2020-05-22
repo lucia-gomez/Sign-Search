@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import Button from 'react-bootstrap/Button';
 import History from './js/history';
 import { search } from './search.js';
+import Icon from './assets/history.png';
 
 import './css/bootstrap.min.css'
 import './css/popup.css';
@@ -13,11 +14,12 @@ function Popup() {
     <div className="App">
       <div class='flex-right'>
         <h3>Sign Search</h3>
-        <input type='text' placeholder="Ex: dog" />
+        <input type='text' placeholder="Ex: dog" style={{ width: '150px' }} />
         <Button variant="primary" size="sm">Go</Button>
+        <div id='container-history-btn' />
       </div>
-      <div id='container'></div>
-      <div id='history' />
+      <div id='container-history' />
+      <div id='container' />
     </div>
   );
 }
@@ -25,13 +27,19 @@ function Popup() {
 document.addEventListener('DOMContentLoaded', function () {
   const history = ReactDOM.render(
     <History />,
-    document.getElementById('history')
+    document.getElementById('container-history')
+  )
+  ReactDOM.render(
+    <Button id='history-btn' onClick={history.click}><img src={Icon}></img></Button>,
+    document.getElementById('container-history-btn')
   )
   document.querySelector('button').addEventListener('click', onclick, false)
   async function onclick() {
     await search(history)
   }
 }, false)
+
+
 
 chrome.tabs.executeScript({
   code: "window.getSelection().toString();"

@@ -15,7 +15,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /* eslint-disable import/first */
 /* global chrome */
 import React from 'react';
-import Button from 'react-bootstrap/Button';
 import ListGroup from 'react-bootstrap/ListGroup';
 import { search } from '../search.js';
 
@@ -177,8 +176,9 @@ var History = function (_React$Component) {
                     searches: newSearches
                   };
                 });
+                this.growDiv();
 
-              case 9:
+              case 10:
               case 'end':
                 return _context4.stop();
             }
@@ -193,9 +193,15 @@ var History = function (_React$Component) {
       return click;
     }()
   }, {
-    key: 'close',
-    value: function close() {
-      this.setState({ open: false });
+    key: 'growDiv',
+    value: function growDiv() {
+      var growDiv = document.getElementById('grow');
+      if (growDiv.clientHeight) {
+        growDiv.style.height = 0;
+      } else {
+        var wrapper = document.getElementById('measuringWrapper');
+        growDiv.style.height = wrapper.clientHeight + "px";
+      }
     }
   }, {
     key: 'render',
@@ -204,26 +210,22 @@ var History = function (_React$Component) {
 
       return React.createElement(
         'div',
-        null,
+        { id: 'grow' },
         React.createElement(
-          Button,
-          { id: 'history-btn', onClick: this.click },
-          'History'
-        ),
-        this.state.open ? React.createElement(
           ListGroup,
-          null,
+          { id: 'measuringWrapper' },
           this.state.searches.map(function (search, key) {
             return React.createElement(
               ListGroup.Item,
               { key: key, onClick: function onClick() {
                   document.querySelector('input').value = search;
+                  _this2.click();
                   _this2.search(_this2);
                 } },
               search
             );
           })
-        ) : null
+        )
       );
     }
   }]);

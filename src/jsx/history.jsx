@@ -1,7 +1,6 @@
 /* eslint-disable import/first */
 /* global chrome */
 import React from 'react'
-import Button from 'react-bootstrap/Button';
 import ListGroup from 'react-bootstrap/ListGroup'
 import { search } from '../search.js';
 
@@ -53,25 +52,31 @@ class History extends React.Component {
       open: !prevState.open,
       searches: newSearches
     }))
+    this.growDiv()
   }
 
-  close() {
-    this.setState({ open: false })
+  growDiv() {
+    const growDiv = document.getElementById('grow');
+    if (growDiv.clientHeight) {
+      growDiv.style.height = 0;
+    } else {
+      const wrapper = document.getElementById('measuringWrapper');
+      growDiv.style.height = wrapper.clientHeight + "px";
+    }
   }
 
   render() {
     return (
-      <div>
-        <Button id='history-btn' onClick={this.click}>History</Button>
-        {this.state.open ?
-          <ListGroup>
-            {this.state.searches.map((search, key) => (
-              <ListGroup.Item key={key} onClick={() => {
-                document.querySelector('input').value = search;
-                this.search(this);
-              }}>{search}</ListGroup.Item>
-            ))}
-          </ListGroup> : null}
+      <div id='grow'>
+        <ListGroup id='measuringWrapper'>
+          {this.state.searches.map((search, key) => (
+            <ListGroup.Item key={key} onClick={() => {
+              document.querySelector('input').value = search;
+              this.click()
+              this.search(this);
+            }}>{search}</ListGroup.Item>
+          ))}
+        </ListGroup>
       </div>
     )
   }

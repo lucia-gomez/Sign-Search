@@ -40,7 +40,6 @@ h3 {
   box-sizing: content-box;
   display: flex;
   flex-direction: column;
-  max-height: 500px;
   overflow-y: auto;
   padding: $padding;
 }
@@ -82,10 +81,29 @@ video {
   text-align: center;
 }
 
+#container-history-btn {
+  margin-left: 5px;
+}
+
 #history-btn {
-  background-color: $light-color;
+  background-color: white;
   border-radius: 0px;
+  padding: 0px;
   width: 100%;
+
+  img {
+    width: 30px;
+  }
+}
+
+#grow {
+  -moz-transition: height .3s;
+  -ms-transition: height .3s;
+  -o-transition: height .3s;
+  -webkit-transition: height .3s;
+  transition: height .3s;
+  height: 0;
+  overflow: hidden;
 }
 
 .list-group {
