@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 class ResultVideo extends React.Component {
   render() {
     return (
-      <video src={this.props.src} autoPlay loop muted />
+      <video src={this.props.src} className='result-item' autoPlay loop muted />
     );
   }
 }

@@ -10,27 +10,23 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 import React from 'react';
 import PropTypes from "prop-types";
 
-var ResultVideo = function (_React$Component) {
-  _inherits(ResultVideo, _React$Component);
+var ResultMedia = function (_React$Component) {
+  _inherits(ResultMedia, _React$Component);
 
-  function ResultVideo() {
-    _classCallCheck(this, ResultVideo);
+  function ResultMedia() {
+    _classCallCheck(this, ResultMedia);
 
-    return _possibleConstructorReturn(this, (ResultVideo.__proto__ || Object.getPrototypeOf(ResultVideo)).apply(this, arguments));
+    return _possibleConstructorReturn(this, (ResultMedia.__proto__ || Object.getPrototypeOf(ResultMedia)).apply(this, arguments));
   }
 
-  _createClass(ResultVideo, [{
+  _createClass(ResultMedia, [{
     key: 'render',
     value: function render() {
-      return React.createElement('video', { src: this.props.src, className: 'result-item', autoPlay: true, loop: true, muted: true });
+      return React.createElement('video', { src: this.props.src, autoPlay: true, loop: true, muted: true, style: { paddingBottom: '2px' } });
     }
   }]);
 
-  return ResultVideo;
+  return ResultMedia;
 }(React.Component);
 
-ResultVideo.propTypes = {
-  src: PropTypes.string.isRequired
-};
-
-export default ResultVideo;
+export default ResultMedia;

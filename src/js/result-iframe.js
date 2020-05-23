@@ -20,9 +20,9 @@ var ResultIFrame = function (_React$Component) {
   }
 
   _createClass(ResultIFrame, [{
-    key: "render",
+    key: 'render',
     value: function render() {
-      return React.createElement("iframe", { src: this.props.src });
+      return React.createElement('iframe', { src: this.props.src, className: 'result-item' });
     }
   }]);
 

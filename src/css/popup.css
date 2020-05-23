@@ -55,6 +55,9 @@ a {
 a:hover {
   color: #753cbf; }
 
+.result-item {
+  padding-bottom: 5px; }
+
 iframe, img {
   width: 100%;
   height: auto; }
@@ -87,6 +90,10 @@ video {
   width: 100%; }
 
 #grow {
+  -moz-transition: height .3s ease;
+  -ms-transition: height .3s ease;
+  -o-transition: height .3s ease;
+  -webkit-transition: height .3s ease;
   transition: height .3s ease;
   height: 0;
   overflow: hidden; }

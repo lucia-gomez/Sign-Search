@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 class ResultImage extends React.Component {
   render() {
     return (
-      <img src={this.props.src} />
+      <img src={this.props.src} className='result-item' />
     );
   }
 }

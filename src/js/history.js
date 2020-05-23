@@ -208,15 +208,6 @@ var History = function (_React$Component) {
     key: 'growDiv',
     value: function growDiv() {
       var growDiv = document.getElementById('grow');
-      // if (this.state.open) {
-      //   const wrapper = document.getElementById('measuringWrapper')
-      //   growDiv.style.maxHeight = wrapper.clientHeight + "px"
-      //   growDiv.style.transform = "scaleY(1)"
-      // }
-      // else {
-      //   growDiv.style.maxHeight = 0
-      //   growDiv.style.transform = "scaleY(0)"
-      // }
       if (!this.state.open) {
         growDiv.style.height = 0;
       } else {

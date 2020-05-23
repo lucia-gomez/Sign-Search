@@ -31,7 +31,7 @@ export async function search(history) {
     const query = getQuery(input, source)
     try {
       const response = await makeRequest(getQueryCORSProxy(query), 'document')
-      const media = parseMedia(response, source)
+      const media = await parseMedia(response, source, input)
       await selectAndRenderMedia(media, source, query, results)
     }
     catch (err) { }
@@ -61,6 +61,10 @@ function getQueryCORSProxy(query) {
   return 'https://peaceful-stream-10554.herokuapp.com/' + query;
 }
 
+function removeCORSProxy(query) {
+  return query.replace('https://peaceful-stream-10554.herokuapp.com/', '')
+}
+
 async function makeRequest(query, responseType) {
   const http = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP")
   return new Promise((resolve, reject) => {
@@ -83,7 +87,8 @@ function lifeprintExclude(src) {
   const exclude = [
     "images-layout/next.gif",
     "images-layout/concepts.gif",
-    "images-layout/back.gif"]
+    "images-layout/back.gif",
+    "signjpegs"]
   for (const ex of exclude) {
     if (src.includes(ex))
       return true
@@ -93,7 +98,7 @@ function lifeprintExclude(src) {
 
 // pull media from webpages
 // returns: dict<MEDIA_TYPE.value, [Element]>
-function parseMedia(response, source) {
+async function parseMedia(response, source, input) {
   const media = {}
   Object.values(MEDIA_TYPE).forEach(type => {
     media[type] = []
@@ -112,7 +117,21 @@ function parseMedia(response, source) {
       break;
 
     case SOURCES.SPREAD_THE_SIGN:
-      media[MEDIA_TYPE.VIDEO] = response.getElementsByTagName('video')
+      media[MEDIA_TYPE.VIDEO].push(response.getElementsByTagName('video')[0])
+      const results = response.getElementsByClassName('search-result')
+      for (let i = 1; i < results.length; i++) {
+        const text = results[i].innerText.trim()
+        const name = processText(text.substring(0, text.lastIndexOf(' ')))
+        if (name === input) {
+          const link = getQueryCORSProxy('https://www.spreadthesign.com/' + removeCORSProxy(results[i].querySelector('a').href))
+          const response2 = await makeRequest(link, 'document')
+          const video2 = response2.getElementsByTagName('video')[0]
+          if (video2) {
+            media[MEDIA_TYPE.VIDEO].push(video2)
+          }
+        }
+      }
+      console.log(media)
       break;
     default:
   }
@@ -123,8 +142,9 @@ async function selectAndRenderMedia(media, source, query, results) {
   const children = []
   let hasVideo = false, hasGif = false
   if (media[MEDIA_TYPE.VIDEO].length > 0) {
-    const src = media[MEDIA_TYPE.VIDEO][0].src
-    children.push(<ResultVideo src={src} />)
+    for (const video of media[MEDIA_TYPE.VIDEO]) {
+      children.push(<ResultVideo src={video.src} />)
+    }
     hasVideo = true
   }
   if (media[MEDIA_TYPE.IFRAME].length > 0) {

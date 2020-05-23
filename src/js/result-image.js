@@ -20,9 +20,9 @@ var ResultImage = function (_React$Component) {
   }
 
   _createClass(ResultImage, [{
-    key: "render",
+    key: 'render',
     value: function render() {
-      return React.createElement("img", { src: this.props.src });
+      return React.createElement('img', { src: this.props.src, className: 'result-item' });
     }
   }]);
 

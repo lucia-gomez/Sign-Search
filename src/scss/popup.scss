@@ -73,6 +73,10 @@ a:hover {
   color: $color;
 }
 
+.result-item {
+  padding-bottom: 5px;
+}
+
 iframe, img {
   width: 100%;
   height: auto;
@@ -114,11 +118,10 @@ video {
 }
 
 #grow {
-  -moz-transition: height .3s;
-  -ms-transition: height .3s;
-  -o-transition: height .3s;
-  -webkit-transition: height .3s;
-  transition: height .3s;
+  -moz-transition: height .3s ease;
+  -ms-transition: height .3s ease;
+  -o-transition: height .3s ease;
+  -webkit-transition: height .3s ease;
   transition: height .3s ease;
   height: 0;
   overflow: hidden;
