@@ -4,7 +4,9 @@ import ReactDOM from 'react-dom';
 import Button from 'react-bootstrap/Button';
 import History from './js/history';
 import { search } from './search.js';
-import Icon from './assets/history.png';
+import Navbar from 'react-bootstrap/Navbar';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHistory } from '@fortawesome/free-solid-svg-icons';
 
 import './css/bootstrap.min.css'
 import './css/popup.css';
@@ -12,12 +14,12 @@ import './css/popup.css';
 function Popup() {
   return (
     <div className="App">
-      <div class='flex-right'>
-        <h3>Sign Search</h3>
-        <input type='text' placeholder="Ex: dog" style={{ width: '150px' }} />
+      <Navbar variant="dark">
+        <Navbar.Brand>Sign Search</Navbar.Brand>
+        <input type='text' placeholder="Search" />
         <Button variant="primary" size="sm">Go</Button>
         <div id='container-history-btn' />
-      </div>
+      </Navbar>
       <div id='container-history' />
       <div id='container' />
     </div>
@@ -30,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('container-history')
   )
   ReactDOM.render(
-    <Button id='history-btn' onClick={history.click}><img src={Icon}></img></Button>,
+    <Button id='history-btn' onClick={history.click}><FontAwesomeIcon id='icon' icon={faHistory} /></Button>,
     document.getElementById('container-history-btn')
   )
   document.querySelector('button').addEventListener('click', onclick, false)

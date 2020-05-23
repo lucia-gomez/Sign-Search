@@ -146,6 +146,8 @@ var History = function (_React$Component) {
     key: 'click',
     value: function () {
       var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee4() {
+        var _this2 = this;
+
         var newSearches;
         return _regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
@@ -175,10 +177,11 @@ var History = function (_React$Component) {
                     open: !prevState.open,
                     searches: newSearches
                   };
+                }, function () {
+                  return _this2.growDiv();
                 });
-                this.growDiv();
 
-              case 10:
+              case 9:
               case 'end':
                 return _context4.stop();
             }
@@ -193,10 +196,28 @@ var History = function (_React$Component) {
       return click;
     }()
   }, {
+    key: 'close',
+    value: function close() {
+      var _this3 = this;
+
+      this.setState({ open: false }, function () {
+        return _this3.growDiv();
+      });
+    }
+  }, {
     key: 'growDiv',
     value: function growDiv() {
       var growDiv = document.getElementById('grow');
-      if (growDiv.clientHeight) {
+      // if (this.state.open) {
+      //   const wrapper = document.getElementById('measuringWrapper')
+      //   growDiv.style.maxHeight = wrapper.clientHeight + "px"
+      //   growDiv.style.transform = "scaleY(1)"
+      // }
+      // else {
+      //   growDiv.style.maxHeight = 0
+      //   growDiv.style.transform = "scaleY(0)"
+      // }
+      if (!this.state.open) {
         growDiv.style.height = 0;
       } else {
         var wrapper = document.getElementById('measuringWrapper');
@@ -206,26 +227,30 @@ var History = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this2 = this;
+      var _this4 = this;
 
       return React.createElement(
         'div',
-        { id: 'grow' },
+        null,
         React.createElement(
-          ListGroup,
-          { id: 'measuringWrapper' },
-          this.state.searches.map(function (search, key) {
-            return React.createElement(
-              ListGroup.Item,
-              { key: key, onClick: function onClick() {
-                  document.querySelector('input').value = search;
-                  _this2.click();
-                  _this2.search(_this2);
-                } },
-              search
-            );
-          })
-        )
+          'div',
+          { id: 'grow' },
+          React.createElement(
+            ListGroup,
+            { id: 'measuringWrapper' },
+            this.state.searches.map(function (search, key) {
+              return React.createElement(
+                ListGroup.Item,
+                { key: key, onClick: function onClick() {
+                    document.querySelector('input').value = search;
+                    _this4.search(_this4);
+                  } },
+                search
+              );
+            })
+          )
+        ),
+        React.createElement('div', { className: 'history-border' })
       );
     }
   }]);

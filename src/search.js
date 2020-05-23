@@ -24,6 +24,7 @@ export async function search(history) {
     document.getElementById('container')
   )
   results.reset()
+  history.close()
   const input = processText(document.querySelector('input').value)
 
   for (const source of Object.values(SOURCES)) {

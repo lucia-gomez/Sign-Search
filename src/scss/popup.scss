@@ -11,11 +11,14 @@ body {
   padding: 10px;
 }
 
-.flex-right {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  padding: $padding;
+.navbar {
+  background-color: $color;
+  padding: 0px 5px;
+}
+
+input {
+  border: none;
+  width: 150px;
 }
 
 h3 {
@@ -26,14 +29,23 @@ h3 {
   padding-right: 10px;
 }
 
+input, .btn:focus {
+  box-shadow: none;
+  outline: none;
+}
+
 .btn {
-  background-color: $color;
+  background-color: $light-color;
   border: none;
   color: white;
 }
 
 .btn:hover, .btn:active, .btn:focus {
-  background-color: $color;
+  background-color: $light-color;
+}
+
+#icon {
+  font-size: 1.5em;
 }
 
 #results {
@@ -86,8 +98,7 @@ video {
 }
 
 #history-btn {
-  background-color: white;
-  border-radius: 0px;
+  background: none;
   padding: 0px;
   width: 100%;
 
@@ -96,12 +107,19 @@ video {
   }
 }
 
+.history-border {
+  background-color: $light-color;
+  height: 5px;
+  width: 100%;
+}
+
 #grow {
   -moz-transition: height .3s;
   -ms-transition: height .3s;
   -o-transition: height .3s;
   -webkit-transition: height .3s;
   transition: height .3s;
+  transition: height .3s ease;
   height: 0;
   overflow: hidden;
 }
@@ -111,5 +129,6 @@ video {
 }
 
 .list-group-item {
+  cursor: pointer;
   padding: 5px;
 }

@@ -49,15 +49,18 @@ class History extends React.Component {
   async click() {
     const newSearches = this.state.open ? this.state.searches : await this.getSearchesToView()
     this.setState(prevState => ({
-      open: !prevState.open,
+      open: !(prevState.open),
       searches: newSearches
-    }))
-    this.growDiv()
+    }), () => this.growDiv())
+  }
+
+  close() {
+    this.setState({ open: false }, () => this.growDiv())
   }
 
   growDiv() {
     const growDiv = document.getElementById('grow');
-    if (growDiv.clientHeight) {
+    if (!this.state.open) {
       growDiv.style.height = 0;
     } else {
       const wrapper = document.getElementById('measuringWrapper');
@@ -67,16 +70,18 @@ class History extends React.Component {
 
   render() {
     return (
-      <div id='grow'>
-        <ListGroup id='measuringWrapper'>
-          {this.state.searches.map((search, key) => (
-            <ListGroup.Item key={key} onClick={() => {
-              document.querySelector('input').value = search;
-              this.click()
-              this.search(this);
-            }}>{search}</ListGroup.Item>
-          ))}
-        </ListGroup>
+      <div>
+        <div id='grow'>
+          <ListGroup id='measuringWrapper'>
+            {this.state.searches.map((search, key) => (
+              <ListGroup.Item key={key} onClick={() => {
+                document.querySelector('input').value = search;
+                this.search(this);
+              }}>{search}</ListGroup.Item>
+            ))}
+          </ListGroup>
+        </div>
+        <div className='history-border'></div>
       </div>
     )
   }
