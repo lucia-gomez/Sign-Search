@@ -6,7 +6,7 @@ class ResultSection extends React.Component {
   render() {
     return (
       <section>
-        <a href={this.props.link} target='_blank'>{this.props.title}</a>
+        <a className='section-title' href={this.props.link} target='_blank'>{this.props.title}</a>
         {this.props.children}
       </section>
     );

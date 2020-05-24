@@ -27,7 +27,7 @@ var ResultSection = function (_React$Component) {
         null,
         React.createElement(
           'a',
-          { href: this.props.link, target: '_blank' },
+          { className: 'section-title', href: this.props.link, target: '_blank' },
           this.props.title
         ),
         this.props.children

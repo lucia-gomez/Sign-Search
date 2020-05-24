@@ -63,14 +63,14 @@ section {
 }
 
 a {
-  color: $light-color;
+  color: $color;
   padding-bottom: $padding;
   text-align: right;
   width: max-content;
 }
 
-a:hover {
-  color: $color;
+.section-title {
+  font-weight: 600;
 }
 
 .result-item {
@@ -84,6 +84,12 @@ iframe, img {
 
 video {
   object-fit: cover;
+  width: 100%;
+}
+
+.caption {
+  margin: 0px;
+  color: $light-color;
 }
 
 #spinner {

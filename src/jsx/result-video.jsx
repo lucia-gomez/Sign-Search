@@ -5,13 +5,17 @@ import PropTypes from "prop-types";
 class ResultVideo extends React.Component {
   render() {
     return (
-      <video src={this.props.src} className='result-item' autoPlay loop muted />
+      <div>
+        {this.props.caption ? <p className='caption'>{this.props.caption}</p> : null}
+        <video src={this.props.src} className='result-item' autoPlay loop muted />
+      </div>
     );
   }
 }
 
 ResultVideo.propTypes = {
-  src: PropTypes.string.isRequired
+  src: PropTypes.string.isRequired,
+  caption: PropTypes.string,
 }
 
 export default ResultVideo

@@ -22,7 +22,16 @@ var ResultVideo = function (_React$Component) {
   _createClass(ResultVideo, [{
     key: 'render',
     value: function render() {
-      return React.createElement('video', { src: this.props.src, className: 'result-item', autoPlay: true, loop: true, muted: true });
+      return React.createElement(
+        'div',
+        null,
+        this.props.caption ? React.createElement(
+          'p',
+          { className: 'caption' },
+          this.props.caption
+        ) : null,
+        React.createElement('video', { src: this.props.src, className: 'result-item', autoPlay: true, loop: true, muted: true })
+      );
     }
   }]);
 
@@ -30,7 +39,8 @@ var ResultVideo = function (_React$Component) {
 }(React.Component);
 
 ResultVideo.propTypes = {
-  src: PropTypes.string.isRequired
+  src: PropTypes.string.isRequired,
+  caption: PropTypes.string
 };
 
 export default ResultVideo;
