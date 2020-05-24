@@ -48,7 +48,8 @@ function processText(input) {
 function getQuery(input, source) {
   switch (source) {
     case SOURCES.LIFEPRINT:
-      return 'http://www.lifeprint.com/asl101/pages-signs/' + input[0] + '/' + input
+      const i = input.replace(" ", "-")
+      return 'http://www.lifeprint.com/asl101/pages-signs/' + i[0] + '/' + i
     case SOURCES.SPREAD_THE_SIGN:
       return 'https://www.spreadthesign.com/en.us/search/?q=' + input
     default:
@@ -105,35 +106,52 @@ async function parseMedia(response, source, input) {
   })
   switch (source) {
     case SOURCES.LIFEPRINT:
-      if (!response.querySelector('blockquote'))
-        break;
-      const imgs = response.querySelector('blockquote').getElementsByTagName("img")
-      for (const img of imgs) {
-        const key = img.src.includes('.gif') ? MEDIA_TYPE.GIF : MEDIA_TYPE.IMAGE
-        if (!lifeprintExclude(img.src))
-          media[key].push(img)
-      }
-      media[MEDIA_TYPE.IFRAME] = response.querySelector('blockquote').getElementsByTagName("iframe")
+      parseLifeprint(media, response)
       break;
-
     case SOURCES.SPREAD_THE_SIGN:
-      media[MEDIA_TYPE.VIDEO].push(response.getElementsByTagName('video')[0])
-      const results = response.getElementsByClassName('search-result')
-      for (let i = 1; i < results.length; i++) {
-        const text = results[i].innerText.trim()
-        const name = processText(text.substring(0, text.lastIndexOf(' ')))
-        if (name === input) {
-          const link = getQueryCORSProxy('https://www.spreadthesign.com/' + removeCORSProxy(results[i].querySelector('a').href))
-          const response2 = await makeRequest(link, 'document')
-          const video2 = response2.getElementsByTagName('video')[0]
-          if (video2) {
-            media[MEDIA_TYPE.VIDEO].push(video2)
-          }
-        }
-      }
-      console.log(media)
+      await parseSpreadTheSign(media, response, input)
       break;
     default:
+  }
+  return media
+}
+
+function parseLifeprint(media, response) {
+  const body = response.querySelector('blockquote')
+  if (!body)
+    return media;
+  const imgs = body.getElementsByTagName("img")
+  for (const img of imgs) {
+    const key = img.src.includes('.gif') ? MEDIA_TYPE.GIF : MEDIA_TYPE.IMAGE
+    if (!lifeprintExclude(img.src))
+      media[key].push(img)
+  }
+  media[MEDIA_TYPE.IFRAME] = body.getElementsByTagName("iframe")
+  // possible links to animated gifs
+  for (const link of body.querySelectorAll('a')) {
+    if (link.href.includes('.gif') && !lifeprintExclude(link.href)) {
+      const dummyImage = document.createElement('img')
+      dummyImage.src = link.href
+      media[MEDIA_TYPE.GIF].push(dummyImage)
+    }
+  }
+  return media
+}
+
+async function parseSpreadTheSign(media, response, input) {
+  media[MEDIA_TYPE.VIDEO].push(response.getElementsByTagName('video')[0])
+  const results = response.getElementsByClassName('search-result')
+  for (let i = 1; i < results.length; i++) {
+    const text = results[i].innerText.trim()
+    const name = processText(text.substring(0, text.lastIndexOf(' ')))
+    if (name === input) {
+      const link = getQueryCORSProxy('https://www.spreadthesign.com/' + removeCORSProxy(results[i].querySelector('a').href))
+      const response2 = await makeRequest(link, 'document')
+      const video2 = response2.getElementsByTagName('video')[0]
+      if (video2) {
+        media[MEDIA_TYPE.VIDEO].push(video2)
+      }
+    }
   }
   return media
 }
