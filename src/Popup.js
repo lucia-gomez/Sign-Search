@@ -2,9 +2,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Button from 'react-bootstrap/Button';
+import Navbar from 'react-bootstrap/Navbar';
+import InputGroup from 'react-bootstrap/InputGroup';
+import Form from 'react-bootstrap/Form';
+
 import History from './js/history';
 import { search } from './search.js';
-import Navbar from 'react-bootstrap/Navbar';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHistory } from '@fortawesome/free-solid-svg-icons';
 
@@ -16,8 +20,15 @@ function Popup() {
     <div className="App">
       <Navbar variant="dark">
         <Navbar.Brand>Sign Search</Navbar.Brand>
-        <input type='text' placeholder="Search" />
-        <Button variant="primary" size="sm">Go</Button>
+        <InputGroup className="input-group-sm">
+          <Form.Control
+            placeholder="Search"
+            aria-label="Search bar"
+          />
+          <InputGroup.Append>
+            <Button id='go-btn' variant="outline-secondary" size="sm">Go</Button>
+          </InputGroup.Append>
+        </InputGroup>
         <div id='container-history-btn' />
       </Navbar>
       <div id='container-history' />
@@ -35,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <Button id='history-btn' onClick={history.click}><FontAwesomeIcon id='icon' icon={faHistory} /></Button>,
     document.getElementById('container-history-btn')
   )
-  document.querySelector('button').addEventListener('click', onclick, false)
+  document.getElementById('go-btn').addEventListener('click', onclick, false)
   async function onclick() {
     await search(history)
   }
