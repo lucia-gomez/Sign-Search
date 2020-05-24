@@ -53,12 +53,14 @@ a {
   width: max-content; }
 
 .section-title {
-  font-weight: 600; }
+  font-weight: 600;
+  text-decoration: underline; }
 
 .result-item {
   padding-bottom: 5px; }
 
 iframe, img {
+  border: none;
   width: 100%;
   height: auto; }
 

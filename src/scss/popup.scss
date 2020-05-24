@@ -71,6 +71,7 @@ a {
 
 .section-title {
   font-weight: 600;
+  text-decoration: underline;
 }
 
 .result-item {
@@ -78,6 +79,7 @@ a {
 }
 
 iframe, img {
+  border: none;
   width: 100%;
   height: auto;
 }

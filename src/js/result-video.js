@@ -20,6 +20,11 @@ var ResultVideo = function (_React$Component) {
   }
 
   _createClass(ResultVideo, [{
+    key: 'capitalizeFirstLetter',
+    value: function capitalizeFirstLetter(caption) {
+      return caption.charAt(0).toUpperCase() + caption.slice(1);
+    }
+  }, {
     key: 'render',
     value: function render() {
       return React.createElement(
@@ -28,7 +33,7 @@ var ResultVideo = function (_React$Component) {
         this.props.caption ? React.createElement(
           'p',
           { className: 'caption' },
-          this.props.caption
+          this.capitalizeFirstLetter(this.props.caption)
         ) : null,
         React.createElement('video', { src: this.props.src, className: 'result-item', autoPlay: true, loop: true, muted: true })
       );
