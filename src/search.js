@@ -84,19 +84,6 @@ async function makeRequest(query, responseType) {
   })
 }
 
-function lifeprintExclude(src) {
-  const exclude = [
-    "images-layout/next.gif",
-    "images-layout/concepts.gif",
-    "images-layout/back.gif",
-    "signjpegs"]
-  for (const ex of exclude) {
-    if (src.includes(ex))
-      return true
-  }
-  return false
-}
-
 // pull media from webpages
 // returns: dict<MEDIA_TYPE.value, [Element]>
 async function parseMedia(response, source, input) {
@@ -117,9 +104,7 @@ async function parseMedia(response, source, input) {
 }
 
 function parseLifeprint(media, response) {
-  const body = response.querySelector('blockquote')
-  if (!body)
-    return media;
+  const body = response.querySelector('body')
   const imgs = body.getElementsByTagName("img")
   for (const img of imgs) {
     const key = img.src.includes('.gif') ? MEDIA_TYPE.GIF : MEDIA_TYPE.IMAGE
@@ -136,6 +121,19 @@ function parseLifeprint(media, response) {
     }
   }
   return media
+}
+
+function lifeprintExclude(src) {
+  const exclude = [
+    "images-layout/next.gif",
+    "images-layout/concepts.gif",
+    "images-layout/back.gif",
+    "fingerspelling/abc-gifs"]
+  for (const ex of exclude) {
+    if (src.includes(ex))
+      return true
+  }
+  return false
 }
 
 async function parseSpreadTheSign(media, response, input) {
@@ -159,7 +157,7 @@ async function parseSpreadTheSign(media, response, input) {
 
 function parseSpreadTheSignMedia(media, response) {
   const video = response.getElementsByTagName('video')
-  if (video) {
+  if (video.length > 0) {
     try {
       const caption = response.getElementsByClassName('result-description')[0].innerText.trim()
       media[MEDIA_TYPE.VIDEO].push({ video: video[0], caption: caption })
