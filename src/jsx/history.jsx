@@ -1,4 +1,5 @@
 /* eslint-disable import/first */
+/* eslint default-case: "off", no-fallthrough: "off" */
 /* global chrome */
 import React from 'react'
 import ListGroup from 'react-bootstrap/ListGroup'
@@ -16,11 +17,13 @@ class History extends React.Component {
     this.init()
   }
 
-  init() {
+  async init() {
     chrome.storage.local.get(this.key, function (hist) {
       if (!hist.search_history)
         chrome.storage.local.set({ search_history: [] })
     })
+    const hist = await this.get()
+    this.setState({ searches: this.getSearchesToView(hist) })
   }
 
   async get() {
@@ -39,18 +42,16 @@ class History extends React.Component {
       hist.shift()
     hist.push(query)
     chrome.storage.local.set({ [this.key]: hist })
+    this.setState({ searches: this.getSearchesToView(hist) })
   }
 
-  async getSearchesToView() {
-    const hist = await this.get()
+  getSearchesToView(hist) {
     return hist.slice(Math.max(hist.length - this.numDisplay, 0)).reverse()
   }
 
   async click() {
-    const newSearches = this.state.open ? this.state.searches : await this.getSearchesToView()
     this.setState(prevState => ({
-      open: !(prevState.open),
-      searches: newSearches
+      open: !(prevState.open)
     }), () => this.growDiv())
   }
 
