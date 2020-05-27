@@ -187,18 +187,18 @@ function checkLifeprintSignURL(url) {
 
 async function parseSpreadTheSign(media, relatedSigns, response, input) {
   // get first video + caption
-  media = parseSpreadTheSignMedia(media, response)
+  // media = parseSpreadTheSignMedia(media, response)
   // scan the list of results for others with same name (parts of speech, homophones, etc)
   const results = response.getElementsByClassName('search-result')
-  for (let i = 1; i < results.length; i++) {
-    const text = results[i].innerText.trim()
-    // ignores part of speech tag
-    const name = processText(text.substring(0, text.lastIndexOf(' ')))
-    const url = 'https://www.spreadthesign.com/' + removeCORSProxy(results[i].querySelector('a').href)
+  for (const result of results) {
+    const text = result.innerText.trim()
+    const i = text.lastIndexOf(' ')
+    const name = processText(text.substring(0, i)), partOfSpeech = text.substring(i + 1)
+    const url = 'https://www.spreadthesign.com/' + removeCORSProxy(result.querySelector('a').href)
     if (name === input) {
       // query the search result's link
       const response2 = await makeRequest(getQueryCORSProxy(url), 'document')
-      media = parseSpreadTheSignMedia(media, response2)
+      media = parseSpreadTheSignMedia(media, partOfSpeech, response2)
     } else {
       relatedSigns.push({ name: name, url: url })
     }
@@ -206,14 +206,14 @@ async function parseSpreadTheSign(media, relatedSigns, response, input) {
   return [media, relatedSigns]
 }
 
-function parseSpreadTheSignMedia(media, response) {
+function parseSpreadTheSignMedia(media, partOfSpeech, response) {
   const video = response.getElementsByTagName('video')
   if (video.length > 0) {
     try {
       const caption = response.getElementsByClassName('result-description')[0].innerText.trim()
-      media[MEDIA_TYPE.VIDEO].push({ video: video[0], caption: caption })
+      media[MEDIA_TYPE.VIDEO].push({ video: video[0], caption: '(' + partOfSpeech + ') ' + caption })
     } catch (err) {
-      media[MEDIA_TYPE.VIDEO].push({ video: video[0], caption: null })
+      media[MEDIA_TYPE.VIDEO].push({ video: video[0], caption: '(' + partOfSpeech + ')' })
     }
   }
   return media
