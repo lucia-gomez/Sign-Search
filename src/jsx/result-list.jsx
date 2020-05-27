@@ -5,7 +5,13 @@ import HandGIF from '../assets/hand-loop.gif'
 class ResultList extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { children: [], done: false, relatedSigns: [] }
+    this.state = {
+      children: [],
+      done: false,
+      relatedSigns: [],
+      tryingNewSearch: false,
+      currentQuery: ""
+    }
   }
 
   addChild(child) {
@@ -19,7 +25,13 @@ class ResultList extends React.Component {
   }
 
   reset() {
-    this.setState({ children: [], done: false, relatedSigns: [] })
+    this.setState({
+      children: [],
+      done: false,
+      relatedSigns: [],
+      tryingNewSearch: false,
+      currentQuery: ""
+    })
   }
 
   finishedLoading() {
@@ -36,11 +48,30 @@ class ResultList extends React.Component {
     </p>
   }
 
+  setCurrentQuery(query) {
+    this.setState({ currentQuery: query })
+  }
+
+  newSearch(query) {
+    this.setCurrentQuery(query)
+    this.setState({ tryingNewSearch: true })
+  }
+
+  renderNewSearch() {
+    if (!this.state.tryingNewSearch)
+      return null
+    if (!this.state.done && this.isEmpty())
+      return <p className='new-search'>No results. Searching for <span>{this.state.currentQuery}</span> instead...</p>
+    if (this.state.done && !this.isEmpty())
+      return <p className='new-search'>Showing results for <span>{this.state.currentQuery}</span></p>
+  }
+
   render() {
     const spinner = <img id='spinner' src={HandGIF} style={{ width: '100px' }} />
     const noResults = <p id='no-results'>No results</p>
     return (
       <div id='results'>
+        {this.renderNewSearch()}
         {!this.state.done && this.isEmpty() ? spinner : null}
         {!this.isEmpty() ? <div>{this.state.children}</div> : null}
         {this.state.done && this.isEmpty() ? noResults : null}

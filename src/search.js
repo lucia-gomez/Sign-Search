@@ -31,9 +31,11 @@ export async function search(history) {
   results.reset()
   history.close()
   let input = processText(document.querySelector('input').value)
+  results.setCurrentQuery(input)
   await searchSources(input, results, history)
   if (results.isEmpty()) {
     input = processNLP(input)
+    results.newSearch(input)
     await searchSources(input, results, history)
   }
   results.finishedLoading()

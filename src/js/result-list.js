@@ -20,7 +20,13 @@ var ResultList = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (ResultList.__proto__ || Object.getPrototypeOf(ResultList)).call(this, props));
 
-    _this.state = { children: [], done: false, relatedSigns: [] };
+    _this.state = {
+      children: [],
+      done: false,
+      relatedSigns: [],
+      tryingNewSearch: false,
+      currentQuery: ""
+    };
     return _this;
   }
 
@@ -35,15 +41,21 @@ var ResultList = function (_React$Component) {
     }
   }, {
     key: 'addRelatedSign',
-    value: function addRelatedSign(sign) {
-      this.setState(function (prevState) {
+    value: function addRelatedSign(sign, relatedQuery) {
+      if (relatedQuery === this.state.currentQuery) this.setState(function (prevState) {
         return { relatedSigns: [].concat(_toConsumableArray(prevState.relatedSigns), [sign]) };
       });
     }
   }, {
     key: 'reset',
     value: function reset() {
-      this.setState({ children: [], done: false, relatedSigns: [] });
+      this.setState({
+        children: [],
+        done: false,
+        relatedSigns: [],
+        tryingNewSearch: false,
+        currentQuery: ""
+      });
     }
   }, {
     key: 'finishedLoading',
@@ -73,6 +85,48 @@ var ResultList = function (_React$Component) {
       );
     }
   }, {
+    key: 'setCurrentQuery',
+    value: function setCurrentQuery(query) {
+      this.setState({ currentQuery: query });
+    }
+  }, {
+    key: 'getCurrentQuery',
+    value: function getCurrentQuery() {
+      return this.state.currentQuery;
+    }
+  }, {
+    key: 'newSearch',
+    value: function newSearch(query) {
+      this.setCurrentQuery(query);
+      this.setState({ tryingNewSearch: true });
+    }
+  }, {
+    key: 'renderNewSearch',
+    value: function renderNewSearch() {
+      if (!this.state.tryingNewSearch) return null;
+      if (!this.state.done && this.isEmpty()) return React.createElement(
+        'p',
+        { className: 'new-search' },
+        'No results. Searching for ',
+        React.createElement(
+          'span',
+          null,
+          this.state.currentQuery
+        ),
+        ' instead...'
+      );
+      if (this.state.done && !this.isEmpty()) return React.createElement(
+        'p',
+        { className: 'new-search' },
+        'Showing results for ',
+        React.createElement(
+          'span',
+          null,
+          this.state.currentQuery
+        )
+      );
+    }
+  }, {
     key: 'render',
     value: function render() {
       var spinner = React.createElement('img', { id: 'spinner', src: HandGIF, style: { width: '100px' } });
@@ -84,6 +138,7 @@ var ResultList = function (_React$Component) {
       return React.createElement(
         'div',
         { id: 'results' },
+        this.renderNewSearch(),
         !this.state.done && this.isEmpty() ? spinner : null,
         !this.isEmpty() ? React.createElement(
           'div',

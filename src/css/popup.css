@@ -52,7 +52,6 @@ section {
 a, .btn-link {
   color: #753cbf;
   padding-bottom: 5px;
-  text-align: right;
   text-decoration: underline;
   width: max-content; }
 
@@ -130,5 +129,11 @@ video {
 
 .related-sign {
   margin: 0px 2px; }
+
+.new-search {
+  text-align: center; }
+  .new-search span {
+    color: #753cbf;
+    font-weight: 600; }
 
 /*# sourceMappingURL=popup.css.map */

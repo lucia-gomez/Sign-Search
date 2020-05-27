@@ -69,7 +69,6 @@ section {
 a, .btn-link {
   color: $color;
   padding-bottom: $padding;
-  text-align: right;
   text-decoration: underline;
   width: max-content;
 }
@@ -166,4 +165,12 @@ video {
 
 .related-sign {
   margin: 0px 2px;
+}
+
+.new-search {
+  text-align: center;
+  span {
+    color: $color;
+    font-weight: 600;
+  }
 }
