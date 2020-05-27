@@ -49,7 +49,7 @@ async function searchSources(input, results, history) {
       const response = await makeRequest(getQueryCORSProxy(query), 'document')
       const [media, relatedSigns] = await parseMedia(response, source, input)
       await selectAndRenderMedia(media, source, query, results)
-      selectAndRenderRelatedSigns(relatedSigns, source, results, history)
+      selectAndRenderRelatedSigns(relatedSigns, input, source, results, history)
     }
     catch (err) { }
   }
@@ -105,10 +105,10 @@ async function makeRequest(query, responseType) {
   })
 }
 
-async function selectAndRenderRelatedSigns(relatedSigns, source, results, history) {
+async function selectAndRenderRelatedSigns(relatedSigns, input, source, results, history) {
   let i = 0
   for (const relatedSign of relatedSigns) {
-    if (i < MAX_REL_SIGNS_PER_SRC) {
+    if (results.getCurrentQuery() === input && i < MAX_REL_SIGNS_PER_SRC) {
       if (source !== SOURCES.SPREAD_THE_SIGN ||
         (source === SOURCES.SPREAD_THE_SIGN && await checkPageHasVideo(relatedSign.url))) {
         i++
@@ -118,7 +118,7 @@ async function selectAndRenderRelatedSigns(relatedSigns, source, results, histor
           onClick={() => {
             document.querySelector('input').value = name;
             search(history);
-          }}>{name}</Button>)
+          }}>{name}</Button>, input)
       }
     } else { break }
   }

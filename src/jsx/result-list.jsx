@@ -20,8 +20,9 @@ class ResultList extends React.Component {
     }))
   }
 
-  addRelatedSign(sign) {
-    this.setState(prevState => ({ relatedSigns: [...prevState.relatedSigns, sign] }))
+  addRelatedSign(sign, relatedQuery) {
+    if (relatedQuery === this.state.currentQuery)
+      this.setState(prevState => ({ relatedSigns: [...prevState.relatedSigns, sign] }))
   }
 
   reset() {
@@ -50,6 +51,10 @@ class ResultList extends React.Component {
 
   setCurrentQuery(query) {
     this.setState({ currentQuery: query })
+  }
+
+  getCurrentQuery() {
+    return this.state.currentQuery
   }
 
   newSearch(query) {
