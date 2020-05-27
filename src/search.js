@@ -8,6 +8,7 @@ import ResultVideo from './js/result-video';
 import ResultIFrame from './js/result-iframe';
 
 import Button from 'react-bootstrap/Button';
+import nlp from 'compromise'
 
 const SOURCES = Object.freeze({
   SPREAD_THE_SIGN: 'Spread the Sign',
@@ -29,26 +30,38 @@ export async function search(history) {
   )
   results.reset()
   history.close()
-  const input = processText(document.querySelector('input').value)
-
-  for (const source of Object.values(SOURCES)) {
-    const query = getQuery(input, source)
-    try {
-      const response = await makeRequest(getQueryCORSProxy(query), 'document')
-      const [media, relatedSigns] = await parseMedia(response, source, input)
-      console.log('list', relatedSigns)
-      await selectAndRenderMedia(media, source, query, results)
-      selectAndRenderRelatedSigns(relatedSigns, source, results, history)
-    }
-    catch (err) { }
+  let input = processText(document.querySelector('input').value)
+  await searchSources(input, results, history)
+  if (results.isEmpty()) {
+    input = processNLP(input)
+    await searchSources(input, results, history)
   }
   results.finishedLoading()
   history.add(input)
 }
 
+async function searchSources(input, results, history) {
+  for (const source of Object.values(SOURCES)) {
+    const query = getQuery(input, source)
+    try {
+      const response = await makeRequest(getQueryCORSProxy(query), 'document')
+      const [media, relatedSigns] = await parseMedia(response, source, input)
+      await selectAndRenderMedia(media, source, query, results)
+      selectAndRenderRelatedSigns(relatedSigns, source, results, history)
+    }
+    catch (err) { }
+  }
+}
+
 function processText(input) {
-  // TODO: stemming or lemmatization?
   return input.toLowerCase().trim()
+}
+
+function processNLP(input) {
+  const doc = nlp(input.toLowerCase().trim())
+  doc.nouns().toSingular()
+  doc.verbs().toInfinitive().all()
+  return doc.text()
 }
 
 function getQuery(input, source) {
