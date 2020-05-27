@@ -7,6 +7,8 @@ import ResultImage from './js/result-image';
 import ResultVideo from './js/result-video';
 import ResultIFrame from './js/result-iframe';
 
+import Button from 'react-bootstrap/Button';
+
 const SOURCES = Object.freeze({
   SPREAD_THE_SIGN: 'Spread the Sign',
   LIFEPRINT: 'Lifeprint'
@@ -96,6 +98,12 @@ async function selectAndRenderRelatedSigns(relatedSigns, source, results, histor
         (source === SOURCES.SPREAD_THE_SIGN && await checkPageHasVideo(relatedSign.url))) {
         i++
         const name = processText(relatedSign.name)
+        results.addRelatedSign(<Button
+          variant="link"
+          onClick={() => {
+            document.querySelector('input').value = name;
+            search(history);
+          }}>{name}</Button>)
       }
     } else { break }
   }

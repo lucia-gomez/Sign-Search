@@ -21,6 +21,10 @@ input {
   width: 150px;
 }
 
+p {
+  margin: 0px;
+}
+
 h3 {
   color: $color;
   font-size: 20px;
@@ -34,7 +38,7 @@ input, .btn:focus {
   outline: none;
 }
 
-.btn {
+.btn:not(.btn-link) {
   background-color: $light-color;
   border: none;
   color: white;
@@ -62,16 +66,29 @@ section {
   padding-top: 20px;
 }
 
-a {
+a, .btn-link {
   color: $color;
   padding-bottom: $padding;
   text-align: right;
+  text-decoration: underline;
   width: max-content;
+}
+
+.btn-link {
+  background-color: $light-color;
+  border: none;
+  color: white;
+  padding: 0px 2px;
+  text-decoration: none;
+  &:hover {
+    background-color: $color;
+    color: white;
+    text-decoration: none;
+  }
 }
 
 .section-title {
   font-weight: 600;
-  text-decoration: underline;
 }
 
 .result-item {
@@ -90,7 +107,6 @@ video {
 }
 
 .caption {
-  margin: 0px;
   color: $light-color;
 }
 
@@ -142,4 +158,12 @@ video {
 .list-group-item {
   cursor: pointer;
   padding: 5px;
+}
+
+#related-signs {
+  padding-top: 20px;
+}
+
+.related-sign {
+  margin: 0px 2px;
 }

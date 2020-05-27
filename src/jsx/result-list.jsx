@@ -30,14 +30,21 @@ class ResultList extends React.Component {
     return this.state.children.length === 0
   }
 
+  renderRelatedSigns() {
+    return <p id='related-signs'>Related signs:<br />{this.state.relatedSigns.map((sign, i) => (
+      <span className='related-sign'>{sign}</span>))}
+    </p>
+  }
+
   render() {
     const spinner = <img id='spinner' src={HandGIF} style={{ width: '100px' }} />
-    const text = <p id='no-results'>No results</p>
+    const noResults = <p id='no-results'>No results</p>
     return (
       <div id='results'>
         {!this.state.done && this.isEmpty() ? spinner : null}
         {!this.isEmpty() ? <div>{this.state.children}</div> : null}
-        {this.state.done && this.isEmpty() ? text : null}
+        {this.state.done && this.isEmpty() ? noResults : null}
+        {this.state.relatedSigns.length > 0 ? this.renderRelatedSigns() : null}
       </div>
     );
   }
