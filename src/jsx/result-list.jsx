@@ -5,7 +5,7 @@ import HandGIF from '../assets/hand-loop.gif'
 class ResultList extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { children: [], done: false }
+    this.state = { children: [], done: false, relatedSigns: [] }
   }
 
   addChild(child) {
@@ -14,8 +14,12 @@ class ResultList extends React.Component {
     }))
   }
 
+  addRelatedSign(sign) {
+    this.setState(prevState => ({ relatedSigns: [...prevState.relatedSigns, sign] }))
+  }
+
   reset() {
-    this.setState({ children: [], done: false })
+    this.setState({ children: [], done: false, relatedSigns: [] })
   }
 
   finishedLoading() {

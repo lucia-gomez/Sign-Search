@@ -20,7 +20,7 @@ var ResultList = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (ResultList.__proto__ || Object.getPrototypeOf(ResultList)).call(this, props));
 
-    _this.state = { children: [], done: false };
+    _this.state = { children: [], done: false, relatedSigns: [] };
     return _this;
   }
 
@@ -34,9 +34,16 @@ var ResultList = function (_React$Component) {
       });
     }
   }, {
+    key: 'addRelatedSign',
+    value: function addRelatedSign(sign) {
+      this.setState(function (prevState) {
+        return { relatedSigns: [].concat(_toConsumableArray(prevState.relatedSigns), [sign]) };
+      });
+    }
+  }, {
     key: 'reset',
     value: function reset() {
-      this.setState({ children: [], done: false });
+      this.setState({ children: [], done: false, relatedSigns: [] });
     }
   }, {
     key: 'finishedLoading',
@@ -49,10 +56,27 @@ var ResultList = function (_React$Component) {
       return this.state.children.length === 0;
     }
   }, {
+    key: 'renderRelatedSigns',
+    value: function renderRelatedSigns() {
+      return React.createElement(
+        'p',
+        { id: 'related-signs' },
+        'Related signs:',
+        React.createElement('br', null),
+        this.state.relatedSigns.map(function (sign, i) {
+          return React.createElement(
+            'span',
+            { className: 'related-sign' },
+            sign
+          );
+        })
+      );
+    }
+  }, {
     key: 'render',
     value: function render() {
       var spinner = React.createElement('img', { id: 'spinner', src: HandGIF, style: { width: '100px' } });
-      var text = React.createElement(
+      var noResults = React.createElement(
         'p',
         { id: 'no-results' },
         'No results'
@@ -66,7 +90,8 @@ var ResultList = function (_React$Component) {
           null,
           this.state.children
         ) : null,
-        this.state.done && this.isEmpty() ? text : null
+        this.state.done && this.isEmpty() ? noResults : null,
+        this.state.relatedSigns.length > 0 ? this.renderRelatedSigns() : null
       );
     }
   }]);

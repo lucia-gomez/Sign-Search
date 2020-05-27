@@ -12,6 +12,9 @@ input {
   border: none;
   width: 150px; }
 
+p {
+  margin: 0px; }
+
 h3 {
   color: #753cbf;
   font-size: 20px;
@@ -23,7 +26,7 @@ input, .btn:focus {
   box-shadow: none;
   outline: none; }
 
-.btn {
+.btn:not(.btn-link) {
   background-color: #b69ed6;
   border: none;
   color: white; }
@@ -46,15 +49,26 @@ section {
   flex-direction: column;
   padding-top: 20px; }
 
-a {
+a, .btn-link {
   color: #753cbf;
   padding-bottom: 5px;
   text-align: right;
+  text-decoration: underline;
   width: max-content; }
 
+.btn-link {
+  background-color: #b69ed6;
+  border: none;
+  color: white;
+  padding: 0px 2px;
+  text-decoration: none; }
+  .btn-link:hover {
+    background-color: #753cbf;
+    color: white;
+    text-decoration: none; }
+
 .section-title {
-  font-weight: 600;
-  text-decoration: underline; }
+  font-weight: 600; }
 
 .result-item {
   padding-bottom: 5px; }
@@ -69,7 +83,6 @@ video {
   width: 100%; }
 
 .caption {
-  margin: 0px;
   color: #b69ed6; }
 
 #spinner {
@@ -111,5 +124,11 @@ video {
 .list-group-item {
   cursor: pointer;
   padding: 5px; }
+
+#related-signs {
+  padding-top: 20px; }
+
+.related-sign {
+  margin: 0px 2px; }
 
 /*# sourceMappingURL=popup.css.map */
