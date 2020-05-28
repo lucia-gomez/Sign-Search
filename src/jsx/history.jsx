@@ -3,7 +3,7 @@
 /* global chrome */
 import React from 'react'
 import ListGroup from 'react-bootstrap/ListGroup'
-import { search } from '../search.js';
+import { search } from '../js/search.js';
 
 class History extends React.Component {
   constructor(props) {

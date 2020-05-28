@@ -1,11 +1,11 @@
 /* global ActiveXObject */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import ResultList from './js/result-list';
-import ResultSection from './js/result-section';
-import ResultImage from './js/result-image';
-import ResultVideo from './js/result-video';
-import ResultIFrame from './js/result-iframe';
+import ResultList from './result-list';
+import ResultSection from './result-section';
+import ResultImage from './result-image';
+import ResultVideo from './result-video';
+import ResultIFrame from './result-iframe';
 
 import Button from 'react-bootstrap/Button';
 import nlp from 'compromise'
@@ -165,11 +165,9 @@ function parseLifeprint(media, relatedSigns, response, input) {
   for (const link of body.querySelectorAll('a')) {
     const url = link.href
     // animated gifs
-    if (url.includes('.gif') && !lifeprintExclude(url)) {
-      const dummyImage = document.createElement('img')
-      dummyImage.src = url
-      media[MEDIA_TYPE.GIF].push(dummyImage)
-    } // related signs
+    if (url.includes('.gif') && !lifeprintExclude(url))
+      media[MEDIA_TYPE.GIF].push({ src: url })
+    // related signs
     else if (!seenLinks.includes(url) && checkLifeprintSignURL(url)) {
       try {
         // "advanced discussion" links sometimes have numbers

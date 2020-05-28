@@ -6,14 +6,14 @@ import Navbar from 'react-bootstrap/Navbar';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 
-import History from './js/history';
+import History from './history';
 import { search } from './search.js';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHistory } from '@fortawesome/free-solid-svg-icons';
 
-import './css/bootstrap.min.css'
-import './css/popup.css';
+import '../css/bootstrap.min.css'
+import '../css/popup.css';
 
 function Popup() {
   return (

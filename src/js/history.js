@@ -17,7 +17,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /* global chrome */
 import React from 'react';
 import ListGroup from 'react-bootstrap/ListGroup';
-import { search } from '../search.js';
+import { search } from '../js/search.js';
 
 var History = function (_React$Component) {
   _inherits(History, _React$Component);
