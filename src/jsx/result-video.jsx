@@ -11,7 +11,7 @@ class ResultVideo extends React.Component {
     return (
       <div>
         {this.props.caption ? <p className='caption'>{this.capitalizeFirstLetter(this.props.caption)}</p> : null}
-        <video src={this.props.src} className='result-item' autoPlay loop muted />
+        <video src={this.props.src} className={this.props.zoom ? "result-item zoom" : "result-item"} autoPlay loop muted />
       </div>
     );
   }
@@ -20,6 +20,7 @@ class ResultVideo extends React.Component {
 ResultVideo.propTypes = {
   src: PropTypes.string.isRequired,
   caption: PropTypes.string,
+  zoom: PropTypes.bool,
 }
 
 export default ResultVideo

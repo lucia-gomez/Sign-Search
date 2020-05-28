@@ -35,7 +35,7 @@ var ResultVideo = function (_React$Component) {
           { className: 'caption' },
           this.capitalizeFirstLetter(this.props.caption)
         ) : null,
-        React.createElement('video', { src: this.props.src, className: 'result-item', autoPlay: true, loop: true, muted: true })
+        React.createElement('video', { src: this.props.src, className: this.props.zoom ? "result-item zoom" : "result-item", autoPlay: true, loop: true, muted: true })
       );
     }
   }]);
@@ -45,7 +45,8 @@ var ResultVideo = function (_React$Component) {
 
 ResultVideo.propTypes = {
   src: PropTypes.string.isRequired,
-  caption: PropTypes.string
+  caption: PropTypes.string,
+  zoom: PropTypes.bool
 };
 
 export default ResultVideo;

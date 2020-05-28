@@ -12,7 +12,8 @@ import nlp from 'compromise'
 
 const SOURCES = Object.freeze({
   SPREAD_THE_SIGN: 'Spread the Sign',
-  LIFEPRINT: 'Lifeprint'
+  LIFEPRINT: 'Lifeprint',
+  SIGNING_SAVVY: 'Signing Savvy'
 })
 const MEDIA_TYPE = Object.freeze({
   GIF: 0,
@@ -73,6 +74,8 @@ function getQuery(input, source) {
       return 'http://www.lifeprint.com/asl101/pages-signs/' + i[0] + '/' + i
     case SOURCES.SPREAD_THE_SIGN:
       return 'https://www.spreadthesign.com/en.us/search/?q=' + input
+    case SOURCES.SIGNING_SAVVY:
+      return 'https://www.signingsavvy.com/sign/' + input
     default:
       return ''
   }
@@ -138,6 +141,9 @@ async function parseMedia(response, source, input) {
       break;
     case SOURCES.SPREAD_THE_SIGN:
       await parseSpreadTheSign(media, relatedSigns, response, input)
+      break;
+    case SOURCES.SIGNING_SAVVY:
+      await parseSigningSavvy(media, relatedSigns, response, input)
       break;
     default:
   }
@@ -239,12 +245,45 @@ async function checkPageHasVideo(url) {
   return response.getElementsByTagName('video').length > 0
 }
 
+async function parseSigningSavvy(media, relatedSigns, response, input) {
+  // if there are multiple versions, go through each
+  const results = response.getElementsByClassName('search_results')[0]
+  if (results) {
+    for (const result of results.getElementsByTagName('a')) {
+      console.log('link', result.href)
+      const response2 = await makeRequest(result.href, 'document')
+      parseSigningSavvyMedia(media, response2, input)
+    }
+  }
+  else
+    parseSigningSavvyMedia(media, response, input)
+  return [media, relatedSigns]
+}
+
+function parseSigningSavvyMedia(media, response, input) {
+  const video = response.getElementsByClassName('signing_body')[0].querySelector('video').querySelector('source')
+  if (video) {
+    const name = processText(response.getElementsByClassName('signing_header')[0].querySelector('h2').innerText)
+    if (input !== name)
+      return
+    try {
+      let caption = response.getElementsByClassName('signing_header')[0].querySelector('em').innerText
+      if (caption[0] === '(')
+        caption = nlp(caption).parentheses().json({ normal: true })[0].normal
+      media[MEDIA_TYPE.VIDEO].push({ video: video, caption: caption })
+    } catch (err) {
+      media[MEDIA_TYPE.VIDEO].push({ video: video, caption: "" })
+    }
+  }
+}
+
 async function selectAndRenderMedia(media, source, query, results) {
   const children = []
   let hasVideo = false, hasGif = false
   if (media[MEDIA_TYPE.VIDEO].length > 0) {
     for (const item of media[MEDIA_TYPE.VIDEO]) {
-      children.push(renderVideo(item))
+      const zoom = source === SOURCES.SIGNING_SAVVY
+      children.push(renderVideo(item, zoom))
     }
     hasVideo = true
   }
@@ -278,6 +317,6 @@ function renderImage(img_src) {
   return <ResultImage src={window.URL.createObjectURL(img_src)} />
 }
 
-function renderVideo(item) {
-  return <ResultVideo src={item.video.src} caption={item.caption} />
+function renderVideo(item, zoom) {
+  return <ResultVideo src={item.video.src} caption={item.caption} zoom={zoom} />
 }

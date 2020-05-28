@@ -47,6 +47,7 @@ input, .btn:focus {
 section {
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   padding-top: 20px; }
 
 a, .btn-link {
@@ -80,6 +81,11 @@ iframe, img {
 video {
   object-fit: cover;
   width: 100%; }
+
+.zoom {
+  left: -20%;
+  position: relative;
+  width: 150%; }
 
 .caption {
   color: #b69ed6; }
