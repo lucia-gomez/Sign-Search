@@ -35,6 +35,7 @@ input, .btn:focus {
   background-color: #b69ed6; }
 
 .icon {
+  background-color: white;
   color: #e9e1f5;
   cursor: pointer;
   font-size: 1em;
@@ -118,11 +119,6 @@ video {
   height: 30px;
   padding: 0px; }
 
-.history-border {
-  background-color: #b69ed6;
-  height: 5px;
-  width: 100%; }
-
 #grow {
   -moz-transition: height .3s ease;
   -ms-transition: height .3s ease;
@@ -133,6 +129,7 @@ video {
   overflow: hidden; }
 
 .list-group {
+  background-color: #753cbf;
   border-radius: 0px;
   max-height: 140px;
   overflow: hidden;
@@ -142,11 +139,17 @@ video {
     display: none; }
 
 .list-group-item-flex {
+  background-color: white;
   border: 1px solid rgba(0, 0, 0, 0.125);
   border-bottom: none;
   display: flex;
+  max-height: 32px;
   justify-content: space-between;
   align-items: center; }
+  .list-group-item-flex.remove {
+    transition: all 0.4s ease-in;
+    max-height: 0;
+    transform: translateX(-100%); }
 
 .list-group-item {
   border: none;

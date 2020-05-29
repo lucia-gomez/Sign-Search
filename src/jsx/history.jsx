@@ -1,5 +1,5 @@
 /* eslint-disable import/first */
-/* eslint default-case: "off", no-fallthrough: "off" */
+/* eslint default-case: "off", no-fallthrough: "off", no-loop-func: "off" */
 /* global chrome */
 import React from 'react'
 import ListGroup from 'react-bootstrap/ListGroup'
@@ -58,10 +58,19 @@ class History extends React.Component {
   }
 
   async remove(index) {
-    const hist = this.state.searches
-    hist.splice(index, 1)
-    this.setState({ searches: hist })
-    chrome.storage.local.set({ [this.key]: hist })
+    const item = document.getElementById('list-group-item-flex-' + index)
+    item.classList.add('remove')
+    const _this = this
+    setTimeout(function () {
+      const hist = _this.state.searches
+      hist.splice(index, 1)
+      _this.setState({ searches: hist })
+      try {
+        item.classList.remove('remove')
+      } catch (err) { }
+      _this.growDiv()
+      chrome.storage.local.set({ [_this.key]: hist })
+    }, 400);
   }
 
   async click() {
@@ -97,7 +106,7 @@ class History extends React.Component {
             {this.state.searches.length === 0 ? noHistory :
               <ListGroup id='search-list'>
                 {this.state.searches.map((search, key) => (
-                  <div className='list-group-item-flex'>
+                  <div className='list-group-item-flex' id={'list-group-item-flex-' + key}>
                     <ListGroup.Item key={key} onClick={() => {
                       document.querySelector('input').value = search;
                       this.search(this);
@@ -107,10 +116,9 @@ class History extends React.Component {
                   </div>
                 ))}
               </ListGroup>}
-            <Button onClick={this.clear} id='clear-btn'>Clear</Button>
+            <Button onClick={this.clear} id='clear-btn' variant="secondary">Clear</Button>
           </div>
         </div>
-        <div className='history-border'></div>
       </div>
     )
   }

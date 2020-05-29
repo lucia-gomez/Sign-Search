@@ -13,7 +13,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 /* eslint-disable import/first */
-/* eslint default-case: "off", no-fallthrough: "off" */
+/* eslint default-case: "off", no-fallthrough: "off", no-loop-func: "off" */
 /* global chrome */
 import React from 'react';
 import ListGroup from 'react-bootstrap/ListGroup';
@@ -29,19 +29,19 @@ var History = function (_React$Component) {
   function History(props) {
     _classCallCheck(this, History);
 
-    var _this = _possibleConstructorReturn(this, (History.__proto__ || Object.getPrototypeOf(History)).call(this, props));
+    var _this2 = _possibleConstructorReturn(this, (History.__proto__ || Object.getPrototypeOf(History)).call(this, props));
 
-    _this.key = 'search_history';
-    _this.maxLength = 100;
-    _this.numDisplay = 5;
-    _this.state = { open: false, searches: [] };
-    _this.clear = _this.clear.bind(_this);
-    _this.click = _this.click.bind(_this);
-    _this.growDiv = _this.growDiv.bind(_this);
-    _this.remove = _this.remove.bind(_this);
-    _this.search = search;
-    _this.init();
-    return _this;
+    _this2.key = 'search_history';
+    _this2.maxLength = 100;
+    _this2.numDisplay = 5;
+    _this2.state = { open: false, searches: [] };
+    _this2.clear = _this2.clear.bind(_this2);
+    _this2.click = _this2.click.bind(_this2);
+    _this2.growDiv = _this2.growDiv.bind(_this2);
+    _this2.remove = _this2.remove.bind(_this2);
+    _this2.search = search;
+    _this2.init();
+    return _this2;
   }
 
   _createClass(History, [{
@@ -180,16 +180,27 @@ var History = function (_React$Component) {
     key: 'remove',
     value: function () {
       var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee5(index) {
-        var hist;
+        var item, _this;
+
         return _regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                hist = this.state.searches;
+                item = document.getElementById('list-group-item-flex-' + index);
 
-                hist.splice(index, 1);
-                this.setState({ searches: hist });
-                chrome.storage.local.set(_defineProperty({}, this.key, hist));
+                item.classList.add('remove');
+                _this = this;
+
+                setTimeout(function () {
+                  var hist = _this.state.searches;
+                  hist.splice(index, 1);
+                  _this.setState({ searches: hist });
+                  try {
+                    item.classList.remove('remove');
+                  } catch (err) {}
+                  _this.growDiv();
+                  chrome.storage.local.set(_defineProperty({}, _this.key, hist));
+                }, 400);
 
               case 4:
               case 'end':
@@ -257,7 +268,7 @@ var History = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this2 = this;
+      var _this3 = this;
 
       var noHistory = React.createElement('img', { src: NothingGIF, onLoad: this.growDiv, style: { width: '100%' } });
       return React.createElement(
@@ -275,29 +286,28 @@ var History = function (_React$Component) {
               this.state.searches.map(function (search, key) {
                 return React.createElement(
                   'div',
-                  { className: 'list-group-item-flex' },
+                  { className: 'list-group-item-flex', id: 'list-group-item-flex-' + key },
                   React.createElement(
                     ListGroup.Item,
                     { key: key, onClick: function onClick() {
                         document.querySelector('input').value = search;
-                        _this2.search(_this2);
+                        _this3.search(_this3);
                       } },
                     search
                   ),
                   React.createElement(FontAwesomeIcon, { icon: faTimesCircle, onClick: function onClick() {
-                      return _this2.remove(key);
+                      return _this3.remove(key);
                     }, className: 'icon' })
                 );
               })
             ),
             React.createElement(
               Button,
-              { onClick: this.clear, id: 'clear-btn' },
+              { onClick: this.clear, id: 'clear-btn', variant: 'secondary' },
               'Clear'
             )
           )
-        ),
-        React.createElement('div', { className: 'history-border' })
+        )
       );
     }
   }]);
