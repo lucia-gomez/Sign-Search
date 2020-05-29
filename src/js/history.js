@@ -20,6 +20,8 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
 import { search } from '../js/search.js';
 import NothingGIF from '../assets/nothing.gif';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 
 var History = function (_React$Component) {
   _inherits(History, _React$Component);
@@ -36,6 +38,7 @@ var History = function (_React$Component) {
     _this.clear = _this.clear.bind(_this);
     _this.click = _this.click.bind(_this);
     _this.growDiv = _this.growDiv.bind(_this);
+    _this.remove = _this.remove.bind(_this);
     _this.search = search;
     _this.init();
     return _this;
@@ -50,18 +53,21 @@ var History = function (_React$Component) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                chrome.storage.local.get(this.key, function (hist) {
+                _context.next = 2;
+                return chrome.storage.local.get(this.key, function (hist) {
                   if (!hist.search_history) chrome.storage.local.set({ search_history: [] });
                 });
-                _context.next = 3;
+
+              case 2:
+                _context.next = 4;
                 return this.get();
 
-              case 3:
+              case 4:
                 hist = _context.sent;
 
-                this.setState({ searches: this.getSearchesToView(hist) });
+                this.setState({ searches: hist });
 
-              case 5:
+              case 6:
               case 'end':
                 return _context.stop();
             }
@@ -152,9 +158,9 @@ var History = function (_React$Component) {
                 hist = _context4.sent;
 
                 if (hist.length === this.maxLength) hist.shift();
-                hist.push(query);
+                hist.unshift(query);
+                this.setState({ searches: hist });
                 chrome.storage.local.set(_defineProperty({}, this.key, hist));
-                this.setState({ searches: this.getSearchesToView(hist) });
 
               case 9:
               case 'end':
@@ -171,17 +177,41 @@ var History = function (_React$Component) {
       return add;
     }()
   }, {
-    key: 'getSearchesToView',
-    value: function getSearchesToView(hist) {
-      return hist.reverse();
-    }
-  }, {
-    key: 'click',
+    key: 'remove',
     value: function () {
-      var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee5() {
+      var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee5(index) {
+        var hist;
         return _regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
+              case 0:
+                hist = this.state.searches;
+
+                hist.splice(index, 1);
+                this.setState({ searches: hist });
+                chrome.storage.local.set(_defineProperty({}, this.key, hist));
+
+              case 4:
+              case 'end':
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function remove(_x2) {
+        return _ref5.apply(this, arguments);
+      }
+
+      return remove;
+    }()
+  }, {
+    key: 'click',
+    value: function () {
+      var _ref6 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee6() {
+        return _regeneratorRuntime.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
               case 0:
                 this.setState(function (prevState) {
                   return {
@@ -191,14 +221,14 @@ var History = function (_React$Component) {
 
               case 1:
               case 'end':
-                return _context5.stop();
+                return _context6.stop();
             }
           }
-        }, _callee5, this);
+        }, _callee6, this);
       }));
 
       function click() {
-        return _ref5.apply(this, arguments);
+        return _ref6.apply(this, arguments);
       }
 
       return click;
@@ -244,12 +274,19 @@ var History = function (_React$Component) {
               { id: 'search-list' },
               this.state.searches.map(function (search, key) {
                 return React.createElement(
-                  ListGroup.Item,
-                  { key: key, onClick: function onClick() {
-                      document.querySelector('input').value = search;
-                      _this2.search(_this2);
-                    } },
-                  search
+                  'div',
+                  { className: 'list-group-item-flex' },
+                  React.createElement(
+                    ListGroup.Item,
+                    { key: key, onClick: function onClick() {
+                        document.querySelector('input').value = search;
+                        _this2.search(_this2);
+                      } },
+                    search
+                  ),
+                  React.createElement(FontAwesomeIcon, { icon: faTimesCircle, onClick: function onClick() {
+                      return _this2.remove(key);
+                    }, className: 'icon' })
                 );
               })
             ),

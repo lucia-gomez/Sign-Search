@@ -6,6 +6,8 @@ import ListGroup from 'react-bootstrap/ListGroup'
 import Button from 'react-bootstrap/Button'
 import { search } from '../js/search.js';
 import NothingGIF from '../assets/nothing.gif'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 
 class History extends React.Component {
   constructor(props) {
@@ -17,17 +19,18 @@ class History extends React.Component {
     this.clear = this.clear.bind(this)
     this.click = this.click.bind(this)
     this.growDiv = this.growDiv.bind(this)
+    this.remove = this.remove.bind(this)
     this.search = search
     this.init()
   }
 
   async init() {
-    chrome.storage.local.get(this.key, function (hist) {
+    await chrome.storage.local.get(this.key, function (hist) {
       if (!hist.search_history)
         chrome.storage.local.set({ search_history: [] })
     })
     const hist = await this.get()
-    this.setState({ searches: this.getSearchesToView(hist) })
+    this.setState({ searches: hist })
   }
 
   async clear() {
@@ -49,13 +52,16 @@ class History extends React.Component {
     const hist = await this.get()
     if (hist.length === this.maxLength)
       hist.shift()
-    hist.push(query)
+    hist.unshift(query)
+    this.setState({ searches: hist })
     chrome.storage.local.set({ [this.key]: hist })
-    this.setState({ searches: this.getSearchesToView(hist) })
   }
 
-  getSearchesToView(hist) {
-    return hist.reverse()
+  async remove(index) {
+    const hist = this.state.searches
+    hist.splice(index, 1)
+    this.setState({ searches: hist })
+    chrome.storage.local.set({ [this.key]: hist })
   }
 
   async click() {
@@ -91,10 +97,14 @@ class History extends React.Component {
             {this.state.searches.length === 0 ? noHistory :
               <ListGroup id='search-list'>
                 {this.state.searches.map((search, key) => (
-                  <ListGroup.Item key={key} onClick={() => {
-                    document.querySelector('input').value = search;
-                    this.search(this);
-                  }}>{search}</ListGroup.Item>
+                  <div className='list-group-item-flex'>
+                    <ListGroup.Item key={key} onClick={() => {
+                      document.querySelector('input').value = search;
+                      this.search(this);
+                    }}>{search}
+                    </ListGroup.Item>
+                    <FontAwesomeIcon icon={faTimesCircle} onClick={() => this.remove(key)} className='icon' />
+                  </div>
                 ))}
               </ListGroup>}
             <Button onClick={this.clear} id='clear-btn'>Clear</Button>
