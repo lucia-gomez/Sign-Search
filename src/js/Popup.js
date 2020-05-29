@@ -8,9 +8,7 @@ import Form from 'react-bootstrap/Form';
 
 import History from './history';
 import { search } from './search.js';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHistory } from '@fortawesome/free-solid-svg-icons';
+import HistoryIcon from '../assets/history.png';
 
 import '../css/bootstrap.min.css'
 import '../css/popup.css';
@@ -43,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('container-history')
   )
   ReactDOM.render(
-    <Button id='history-btn' onClick={history.click}><FontAwesomeIcon id='icon' icon={faHistory} /></Button>,
+    <Button id='history-btn' onClick={history.click}><img src={HistoryIcon} id='icon' alt='search history icon' /></Button>,
     document.getElementById('container-history-btn')
   )
   document.getElementById('go-btn').addEventListener('click', onclick, false)
