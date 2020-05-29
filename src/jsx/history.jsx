@@ -3,7 +3,9 @@
 /* global chrome */
 import React from 'react'
 import ListGroup from 'react-bootstrap/ListGroup'
+import Button from 'react-bootstrap/Button'
 import { search } from '../js/search.js';
+import NothingGIF from '../assets/nothing.gif'
 
 class History extends React.Component {
   constructor(props) {
@@ -12,7 +14,9 @@ class History extends React.Component {
     this.maxLength = 100
     this.numDisplay = 5
     this.state = { open: false, searches: [] }
+    this.clear = this.clear.bind(this)
     this.click = this.click.bind(this)
+    this.growDiv = this.growDiv.bind(this)
     this.search = search
     this.init()
   }
@@ -24,6 +28,11 @@ class History extends React.Component {
     })
     const hist = await this.get()
     this.setState({ searches: this.getSearchesToView(hist) })
+  }
+
+  async clear() {
+    chrome.storage.local.set({ search_history: [] })
+    this.setState({ searches: [] })
   }
 
   async get() {
@@ -46,41 +55,50 @@ class History extends React.Component {
   }
 
   getSearchesToView(hist) {
-    return hist.slice(Math.max(hist.length - this.numDisplay, 0)).reverse()
+    return hist.reverse()
   }
 
   async click() {
     this.setState(prevState => ({
       open: !(prevState.open)
-    }), () => this.growDiv())
+    }))
   }
 
   close() {
-    this.setState({ open: false }, () => this.growDiv())
+    this.setState({ open: false })
   }
 
   growDiv() {
-    const growDiv = document.getElementById('grow');
+    const growDiv = document.getElementById('grow')
     if (!this.state.open) {
-      growDiv.style.height = 0;
+      growDiv.style.height = 0
     } else {
-      const wrapper = document.getElementById('measuringWrapper');
-      growDiv.style.height = wrapper.clientHeight + "px";
+      const wrapper = document.getElementById('measuringWrapper')
+      growDiv.style.height = Math.floor(wrapper.offsetHeight) + "px"
     }
   }
 
+  componentDidUpdate() {
+    this.growDiv()
+  }
+
   render() {
+    const noHistory = <img src={NothingGIF} onLoad={this.growDiv} style={{ width: '100%' }} />
     return (
       <div>
         <div id='grow'>
-          <ListGroup id='measuringWrapper'>
-            {this.state.searches.map((search, key) => (
-              <ListGroup.Item key={key} onClick={() => {
-                document.querySelector('input').value = search;
-                this.search(this);
-              }}>{search}</ListGroup.Item>
-            ))}
-          </ListGroup>
+          <div id='measuringWrapper'>
+            {this.state.searches.length === 0 ? noHistory :
+              <ListGroup id='search-list'>
+                {this.state.searches.map((search, key) => (
+                  <ListGroup.Item key={key} onClick={() => {
+                    document.querySelector('input').value = search;
+                    this.search(this);
+                  }}>{search}</ListGroup.Item>
+                ))}
+              </ListGroup>}
+            <Button onClick={this.clear} id='clear-btn'>Clear</Button>
+          </div>
         </div>
         <div className='history-border'></div>
       </div>

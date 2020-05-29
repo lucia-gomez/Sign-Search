@@ -109,6 +109,12 @@ video {
   #history-btn img {
     width: 30px; }
 
+#clear-btn {
+  border-radius: 0px;
+  width: 100%;
+  height: 30px;
+  padding: 0px; }
+
 .history-border {
   background-color: #b69ed6;
   height: 5px;
@@ -124,11 +130,17 @@ video {
   overflow: hidden; }
 
 .list-group {
-  border-radius: 0px; }
+  border-radius: 0px;
+  max-height: 140px;
+  overflow: hidden;
+  overflow-y: scroll;
+  -ms-overflow-style: none; }
+  .list-group::-webkit-scrollbar {
+    display: none; }
 
 .list-group-item {
   cursor: pointer;
-  padding: 5px; }
+  padding: 3px; }
 
 #related-signs {
   padding-top: 20px; }

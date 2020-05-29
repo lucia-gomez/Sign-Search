@@ -248,7 +248,6 @@ async function parseSigningSavvy(media, relatedSigns, response, input) {
   const results = response.getElementsByClassName('search_results')[0]
   if (results) {
     for (const result of results.getElementsByTagName('a')) {
-      console.log('link', result.href)
       const response2 = await makeRequest(result.href, 'document')
       parseSigningSavvyMedia(media, response2, input)
     }

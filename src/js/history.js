@@ -17,7 +17,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /* global chrome */
 import React from 'react';
 import ListGroup from 'react-bootstrap/ListGroup';
+import Button from 'react-bootstrap/Button';
 import { search } from '../js/search.js';
+import NothingGIF from '../assets/nothing.gif';
 
 var History = function (_React$Component) {
   _inherits(History, _React$Component);
@@ -31,7 +33,9 @@ var History = function (_React$Component) {
     _this.maxLength = 100;
     _this.numDisplay = 5;
     _this.state = { open: false, searches: [] };
+    _this.clear = _this.clear.bind(_this);
     _this.click = _this.click.bind(_this);
+    _this.growDiv = _this.growDiv.bind(_this);
     _this.search = search;
     _this.init();
     return _this;
@@ -72,20 +76,17 @@ var History = function (_React$Component) {
       return init;
     }()
   }, {
-    key: 'get',
+    key: 'clear',
     value: function () {
       var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2() {
         return _regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                return _context2.abrupt('return', new Promise(function (resolve, _) {
-                  chrome.storage.local.get('search_history', function (hist) {
-                    resolve(hist.search_history);
-                  });
-                }));
+                chrome.storage.local.set({ search_history: [] });
+                this.setState({ searches: [] });
 
-              case 1:
+              case 2:
               case 'end':
                 return _context2.stop();
             }
@@ -93,8 +94,36 @@ var History = function (_React$Component) {
         }, _callee2, this);
       }));
 
-      function get() {
+      function clear() {
         return _ref2.apply(this, arguments);
+      }
+
+      return clear;
+    }()
+  }, {
+    key: 'get',
+    value: function () {
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee3() {
+        return _regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                return _context3.abrupt('return', new Promise(function (resolve, _) {
+                  chrome.storage.local.get('search_history', function (hist) {
+                    resolve(hist.search_history);
+                  });
+                }));
+
+              case 1:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function get() {
+        return _ref3.apply(this, arguments);
       }
 
       return get;
@@ -102,25 +131,25 @@ var History = function (_React$Component) {
   }, {
     key: 'add',
     value: function () {
-      var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee3(query) {
+      var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee4(query) {
         var hist;
-        return _regeneratorRuntime.wrap(function _callee3$(_context3) {
+        return _regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 if (!(query.length === 0)) {
-                  _context3.next = 2;
+                  _context4.next = 2;
                   break;
                 }
 
-                return _context3.abrupt('return');
+                return _context4.abrupt('return');
 
               case 2:
-                _context3.next = 4;
+                _context4.next = 4;
                 return this.get();
 
               case 4:
-                hist = _context3.sent;
+                hist = _context4.sent;
 
                 if (hist.length === this.maxLength) hist.shift();
                 hist.push(query);
@@ -129,14 +158,14 @@ var History = function (_React$Component) {
 
               case 9:
               case 'end':
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee4, this);
       }));
 
       function add(_x) {
-        return _ref3.apply(this, arguments);
+        return _ref4.apply(this, arguments);
       }
 
       return add;
@@ -144,36 +173,32 @@ var History = function (_React$Component) {
   }, {
     key: 'getSearchesToView',
     value: function getSearchesToView(hist) {
-      return hist.slice(Math.max(hist.length - this.numDisplay, 0)).reverse();
+      return hist.reverse();
     }
   }, {
     key: 'click',
     value: function () {
-      var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee4() {
-        var _this2 = this;
-
-        return _regeneratorRuntime.wrap(function _callee4$(_context4) {
+      var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee5() {
+        return _regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 this.setState(function (prevState) {
                   return {
                     open: !prevState.open
                   };
-                }, function () {
-                  return _this2.growDiv();
                 });
 
               case 1:
               case 'end':
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4, this);
+        }, _callee5, this);
       }));
 
       function click() {
-        return _ref4.apply(this, arguments);
+        return _ref5.apply(this, arguments);
       }
 
       return click;
@@ -181,11 +206,7 @@ var History = function (_React$Component) {
   }, {
     key: 'close',
     value: function close() {
-      var _this3 = this;
-
-      this.setState({ open: false }, function () {
-        return _this3.growDiv();
-      });
+      this.setState({ open: false });
     }
   }, {
     key: 'growDiv',
@@ -195,14 +216,20 @@ var History = function (_React$Component) {
         growDiv.style.height = 0;
       } else {
         var wrapper = document.getElementById('measuringWrapper');
-        growDiv.style.height = wrapper.clientHeight + "px";
+        growDiv.style.height = Math.floor(wrapper.offsetHeight) + "px";
       }
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate() {
+      this.growDiv();
     }
   }, {
     key: 'render',
     value: function render() {
-      var _this4 = this;
+      var _this2 = this;
 
+      var noHistory = React.createElement('img', { src: NothingGIF, onLoad: this.growDiv, style: { width: '100%' } });
       return React.createElement(
         'div',
         null,
@@ -210,18 +237,27 @@ var History = function (_React$Component) {
           'div',
           { id: 'grow' },
           React.createElement(
-            ListGroup,
+            'div',
             { id: 'measuringWrapper' },
-            this.state.searches.map(function (search, key) {
-              return React.createElement(
-                ListGroup.Item,
-                { key: key, onClick: function onClick() {
-                    document.querySelector('input').value = search;
-                    _this4.search(_this4);
-                  } },
-                search
-              );
-            })
+            this.state.searches.length === 0 ? noHistory : React.createElement(
+              ListGroup,
+              { id: 'search-list' },
+              this.state.searches.map(function (search, key) {
+                return React.createElement(
+                  ListGroup.Item,
+                  { key: key, onClick: function onClick() {
+                      document.querySelector('input').value = search;
+                      _this2.search(_this2);
+                    } },
+                  search
+                );
+              })
+            ),
+            React.createElement(
+              Button,
+              { onClick: this.clear, id: 'clear-btn' },
+              'Clear'
+            )
           )
         ),
         React.createElement('div', { className: 'history-border' })
