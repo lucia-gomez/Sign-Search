@@ -157,9 +157,13 @@ function parseLifeprint(media, relatedSigns, response, input) {
   const body = response.querySelector('body')
   const imgs = body.getElementsByTagName("img")
   for (const img of imgs) {
-    const key = img.src.includes('.gif') ? MEDIA_TYPE.GIF : MEDIA_TYPE.IMAGE
-    if (!lifeprintExclude(img.src))
-      media[key].push(img)
+    if (!lifeprintExclude(img.src) && img.src.includes('signjpegs'))
+      media[MEDIA_TYPE.IMAGE].push(img)
+    else {
+      const key = img.src.includes('.gif') ? MEDIA_TYPE.GIF : MEDIA_TYPE.IMAGE
+      if (!lifeprintExclude(img.src))
+        media[key].push(img)
+    }
   }
   media[MEDIA_TYPE.IFRAME] = body.getElementsByTagName("iframe")
 
@@ -186,9 +190,7 @@ function parseLifeprint(media, relatedSigns, response, input) {
 
 function lifeprintExclude(src) {
   const exclude = [
-    "images-layout/next.gif",
-    "images-layout/concepts.gif",
-    "images-layout/back.gif",
+    "images-layout",
     "fingerspelling/abc-gifs"]
   for (const ex of exclude) {
     if (src.includes(ex))
