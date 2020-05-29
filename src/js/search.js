@@ -35,9 +35,12 @@ export async function search(history) {
   results.setCurrentQuery(input)
   await searchSources(input, results, history)
   if (results.isEmpty()) {
-    input = processNLP(input)
-    results.newSearch(input)
-    await searchSources(input, results, history)
+    const newInput = processNLP(input)
+    if (newInput !== input) {
+      input = newInput
+      results.newSearch(input)
+      await searchSources(input, results, history)
+    }
   }
   results.finishedLoading()
   history.add(input)
