@@ -16,7 +16,7 @@ import '../css/popup.css';
 function Popup() {
   return (
     <div className="App">
-      <Navbar variant="dark">
+      <Navbar variant="dark" sticky="top">
         <Navbar.Brand>Sign Search</Navbar.Brand>
         <InputGroup className="input-group-sm">
           <Form.Control
