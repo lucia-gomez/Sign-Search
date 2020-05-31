@@ -25,12 +25,14 @@ class History extends React.Component {
   }
 
   async init() {
-    await chrome.storage.local.get(this.key, function (hist) {
+    chrome.storage.local.get(this.key, async function (hist) {
       if (!hist.search_history)
-        chrome.storage.local.set({ search_history: [] })
-    })
-    const hist = await this.get()
-    this.setState({ searches: hist })
+        await chrome.storage.local.set({ search_history: ['test'] })
+      const _get = function (hist) {
+        this.setState({ searches: hist.search_history })
+      }.bind(this)
+      await this.get(_get)
+    }.bind(this))
   }
 
   async clear() {
@@ -38,23 +40,22 @@ class History extends React.Component {
     this.setState({ searches: [] })
   }
 
-  async get() {
-    return new Promise(function (resolve, _) {
-      chrome.storage.local.get('search_history', function (hist) {
-        resolve(hist.search_history)
-      })
-    })
+  async get(callback) {
+    await chrome.storage.local.get(this.key, callback)
   }
 
   async add(query) {
     if (query.length === 0)
       return
-    const hist = await this.get()
-    if (hist.length === this.maxLength)
-      hist.shift()
-    hist.unshift(query)
-    this.setState({ searches: hist })
-    chrome.storage.local.set({ [this.key]: hist })
+    const _add = function (histObj) {
+      const hist = histObj.search_history
+      if (hist.length === this.maxLength)
+        hist.shift()
+      hist.unshift(query)
+      this.setState({ searches: hist })
+      chrome.storage.local.set({ [this.key]: hist })
+    }.bind(this)
+    await this.get(_add)
   }
 
   async remove(index) {

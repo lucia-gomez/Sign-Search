@@ -47,32 +47,54 @@ var History = function (_React$Component) {
   _createClass(History, [{
     key: 'init',
     value: function () {
-      var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee() {
-        var hist;
-        return _regeneratorRuntime.wrap(function _callee$(_context) {
+      var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2() {
+        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
-                _context.next = 2;
-                return chrome.storage.local.get(this.key, function (hist) {
-                  if (!hist.search_history) chrome.storage.local.set({ search_history: [] });
-                });
+                chrome.storage.local.get(this.key, function () {
+                  var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee(hist) {
+                    var _get;
 
-              case 2:
-                _context.next = 4;
-                return this.get();
+                    return _regeneratorRuntime.wrap(function _callee$(_context) {
+                      while (1) {
+                        switch (_context.prev = _context.next) {
+                          case 0:
+                            if (hist.search_history) {
+                              _context.next = 3;
+                              break;
+                            }
 
-              case 4:
-                hist = _context.sent;
+                            _context.next = 3;
+                            return chrome.storage.local.set({ search_history: ['test'] });
 
-                this.setState({ searches: hist });
+                          case 3:
+                            _get = function (hist) {
+                              this.setState({ searches: hist.search_history });
+                            }.bind(this);
 
-              case 6:
+                            _context.next = 6;
+                            return this.get(_get);
+
+                          case 6:
+                          case 'end':
+                            return _context.stop();
+                        }
+                      }
+                    }, _callee, this);
+                  }));
+
+                  return function (_x) {
+                    return _ref2.apply(this, arguments);
+                  };
+                }().bind(this));
+
+              case 1:
               case 'end':
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee, this);
+        }, _callee2, this);
       }));
 
       function init() {
@@ -84,43 +106,15 @@ var History = function (_React$Component) {
   }, {
     key: 'clear',
     value: function () {
-      var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2() {
-        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                chrome.storage.local.set({ search_history: [] });
-                this.setState({ searches: [] });
-
-              case 2:
-              case 'end':
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      function clear() {
-        return _ref2.apply(this, arguments);
-      }
-
-      return clear;
-    }()
-  }, {
-    key: 'get',
-    value: function () {
       var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee3() {
         return _regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                return _context3.abrupt('return', new Promise(function (resolve, _) {
-                  chrome.storage.local.get('search_history', function (hist) {
-                    resolve(hist.search_history);
-                  });
-                }));
+                chrome.storage.local.set({ search_history: [] });
+                this.setState({ searches: [] });
 
-              case 1:
+              case 2:
               case 'end':
                 return _context3.stop();
             }
@@ -128,41 +122,24 @@ var History = function (_React$Component) {
         }, _callee3, this);
       }));
 
-      function get() {
+      function clear() {
         return _ref3.apply(this, arguments);
       }
 
-      return get;
+      return clear;
     }()
   }, {
-    key: 'add',
+    key: 'get',
     value: function () {
-      var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee4(query) {
-        var hist;
+      var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee4(callback) {
         return _regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                if (!(query.length === 0)) {
-                  _context4.next = 2;
-                  break;
-                }
-
-                return _context4.abrupt('return');
+                _context4.next = 2;
+                return chrome.storage.local.get(this.key, callback);
 
               case 2:
-                _context4.next = 4;
-                return this.get();
-
-              case 4:
-                hist = _context4.sent;
-
-                if (hist.length === this.maxLength) hist.shift();
-                hist.unshift(query);
-                this.setState({ searches: hist });
-                chrome.storage.local.set(_defineProperty({}, this.key, hist));
-
-              case 9:
               case 'end':
                 return _context4.stop();
             }
@@ -170,8 +147,51 @@ var History = function (_React$Component) {
         }, _callee4, this);
       }));
 
-      function add(_x) {
+      function get(_x2) {
         return _ref4.apply(this, arguments);
+      }
+
+      return get;
+    }()
+  }, {
+    key: 'add',
+    value: function () {
+      var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee5(query) {
+        var _add;
+
+        return _regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                if (!(query.length === 0)) {
+                  _context5.next = 2;
+                  break;
+                }
+
+                return _context5.abrupt('return');
+
+              case 2:
+                _add = function (histObj) {
+                  var hist = histObj.search_history;
+                  if (hist.length === this.maxLength) hist.shift();
+                  hist.unshift(query);
+                  this.setState({ searches: hist });
+                  chrome.storage.local.set(_defineProperty({}, this.key, hist));
+                }.bind(this);
+
+                _context5.next = 5;
+                return this.get(_add);
+
+              case 5:
+              case 'end':
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function add(_x3) {
+        return _ref5.apply(this, arguments);
       }
 
       return add;
@@ -179,12 +199,12 @@ var History = function (_React$Component) {
   }, {
     key: 'remove',
     value: function () {
-      var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee5(index) {
+      var _ref6 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee6(index) {
         var item, _this;
 
-        return _regeneratorRuntime.wrap(function _callee5$(_context5) {
+        return _regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
                 item = document.getElementById('list-group-item-flex-' + index);
 
@@ -204,14 +224,14 @@ var History = function (_React$Component) {
 
               case 4:
               case 'end':
-                return _context5.stop();
+                return _context6.stop();
             }
           }
-        }, _callee5, this);
+        }, _callee6, this);
       }));
 
-      function remove(_x2) {
-        return _ref5.apply(this, arguments);
+      function remove(_x4) {
+        return _ref6.apply(this, arguments);
       }
 
       return remove;
@@ -219,10 +239,10 @@ var History = function (_React$Component) {
   }, {
     key: 'click',
     value: function () {
-      var _ref6 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee6() {
-        return _regeneratorRuntime.wrap(function _callee6$(_context6) {
+      var _ref7 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee7() {
+        return _regeneratorRuntime.wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
                 this.setState(function (prevState) {
                   return {
@@ -232,14 +252,14 @@ var History = function (_React$Component) {
 
               case 1:
               case 'end':
-                return _context6.stop();
+                return _context7.stop();
             }
           }
-        }, _callee6, this);
+        }, _callee7, this);
       }));
 
       function click() {
-        return _ref6.apply(this, arguments);
+        return _ref7.apply(this, arguments);
       }
 
       return click;
