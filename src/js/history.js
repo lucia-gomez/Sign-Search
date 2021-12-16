@@ -66,7 +66,7 @@ var History = function (_React$Component) {
                             }
 
                             _context.next = 3;
-                            return chrome.storage.local.set({ search_history: ['test'] });
+                            return chrome.storage.local.set({ search_history: [] });
 
                           case 3:
                             _get = function (hist) {

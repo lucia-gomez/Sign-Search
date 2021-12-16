@@ -27,7 +27,7 @@ class History extends React.Component {
   async init() {
     chrome.storage.local.get(this.key, async function (hist) {
       if (!hist.search_history)
-        await chrome.storage.local.set({ search_history: ['test'] })
+        await chrome.storage.local.set({ search_history: [] })
       const _get = function (hist) {
         this.setState({ searches: hist.search_history })
       }.bind(this)
