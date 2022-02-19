@@ -74,7 +74,7 @@ function getQuery(input, source) {
   switch (source) {
     case SOURCES.LIFEPRINT:
       const i = input.replace(" ", "-")
-      return 'http://www.lifeprint.com/asl101/pages-signs/' + i[0] + '/' + i
+      return 'http://www.lifeprint.com/asl101/pages-signs/' + i[0] + '/' + i + '.htm'
     case SOURCES.SPREAD_THE_SIGN:
       return 'https://www.spreadthesign.com/en.us/search/?q=' + input
     case SOURCES.SIGNING_SAVVY:
