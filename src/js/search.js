@@ -10,10 +10,14 @@ import ResultIFrame from './result-iframe';
 import Button from 'react-bootstrap/Button';
 import nlp from 'compromise'
 
+import $ from 'jquery';
+import youtube from "../private-keys";
+
 const SOURCES = Object.freeze({
   SPREAD_THE_SIGN: 'Spread the Sign',
   LIFEPRINT: 'Lifeprint',
-  SIGNING_SAVVY: 'Signing Savvy'
+  SIGNING_SAVVY: 'Signing Savvy',
+  SMART_SIGN_DICTIONARY: 'SmartSign Dictionary',
 })
 const MEDIA_TYPE = Object.freeze({
   GIF: 0,
@@ -48,9 +52,30 @@ export async function search(history) {
 
 async function searchSources(input, results, history) {
   for (const source of Object.values(SOURCES)) {
-    const query = getQuery(input, source)
+    let response;
+    const query = getQuery(input, source);
+
     try {
-      const response = await makeRequest(getQueryCORSProxy(query), 'document')
+      if (source === SOURCES.SMART_SIGN_DICTIONARY) {
+        await $.ajax({
+          url: getQueryCORSProxy("https://youtube.googleapis.com/youtube/v3/search"),
+          type: "get",
+          data: {
+            key: youtube,
+            part: "snippet",
+            channelId: "UCACxqsL_FA-gMD2fwil7ZXA",
+            q: input,
+            order: 'relevance',
+            type: 'video',
+            maxResults: 10,
+          },
+          success: data => {
+            response = data;
+          }
+        });
+      } else {
+        response = await makeRequest(getQueryCORSProxy(query), 'document')
+      }
       const [media, relatedSigns] = await parseMedia(response, source, input)
       await selectAndRenderMedia(media, source, query, results)
       selectAndRenderRelatedSigns(relatedSigns, input, source, results, history)
@@ -79,6 +104,8 @@ function getQuery(input, source) {
       return 'https://www.spreadthesign.com/en.us/search/?q=' + input
     case SOURCES.SIGNING_SAVVY:
       return 'https://www.signingsavvy.com/sign/' + input
+    case SOURCES.SMART_SIGN_DICTIONARY:
+      return 'https://www.youtube.com/user/smartsigndictionary/search?query=' + input
     default:
       return ''
   }
@@ -148,6 +175,9 @@ async function parseMedia(response, source, input) {
     case SOURCES.SIGNING_SAVVY:
       await parseSigningSavvy(media, relatedSigns, response, input)
       break;
+    case SOURCES.SMART_SIGN_DICTIONARY:
+      parseSmartSignDictionary(media, relatedSigns, response)
+      break;
     default:
   }
   return [media, relatedSigns]
@@ -165,7 +195,8 @@ function parseLifeprint(media, relatedSigns, response, input) {
         media[key].push(img)
     }
   }
-  media[MEDIA_TYPE.IFRAME] = body.getElementsByTagName("iframe")
+
+  media[MEDIA_TYPE.IFRAME] = Array.from(body.getElementsByTagName("iframe")).map(item => { return { src: item.src } });
 
   // scan links for related signs and animated gifs
   const seenLinks = []
@@ -279,6 +310,24 @@ function parseSigningSavvyMedia(media, response, input) {
   }
 }
 
+// result.items
+// item.snippet.title
+// item.id.videoId
+function parseSmartSignDictionary(media, relatedSigns, response) {
+  response.items.forEach(item => {
+    let caption = item.snippet.title;
+    const len = caption.length;
+    if (caption.substring(len - 3, len).toUpperCase() === "ASL") {
+      caption = caption.substring(0, len - 3);
+    }
+    media[MEDIA_TYPE.IFRAME].push({
+      src: `https://www.youtube.com/embed/${item.id.videoId}?`,
+      caption: caption,
+    });
+  })
+  return [media, relatedSigns];
+}
+
 async function selectAndRenderMedia(media, source, query, results) {
   const children = []
   let hasVideo = false, hasGif = false
@@ -290,8 +339,9 @@ async function selectAndRenderMedia(media, source, query, results) {
     hasVideo = true
   }
   if (media[MEDIA_TYPE.IFRAME].length > 0) {
-    const src = media[MEDIA_TYPE.IFRAME][0].src
-    children.push(<ResultIFrame src={src} />)
+    let maxShow = 1;
+    const iframes = media[MEDIA_TYPE.IFRAME].slice(0, maxShow);
+    iframes.forEach(item => children.push(renderIFrame(item)));
     hasVideo = true
   }
   if (media[MEDIA_TYPE.GIF].length > 0) {
@@ -321,4 +371,8 @@ function renderImage(img_src) {
 
 function renderVideo(item, zoom) {
   return <ResultVideo src={item.video.src} caption={item.caption} zoom={zoom} />
+}
+
+function renderIFrame(item) {
+  return <ResultIFrame src={item.src} caption={item.caption} />
 }

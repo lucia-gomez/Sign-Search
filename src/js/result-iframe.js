@@ -20,9 +20,23 @@ var ResultIFrame = function (_React$Component) {
   }
 
   _createClass(ResultIFrame, [{
+    key: 'capitalizeFirstLetter',
+    value: function capitalizeFirstLetter(caption) {
+      return caption.charAt(0).toUpperCase() + caption.slice(1);
+    }
+  }, {
     key: 'render',
     value: function render() {
-      return React.createElement('iframe', { src: this.props.src, className: 'result-item' });
+      return React.createElement(
+        'div',
+        null,
+        this.props.caption ? React.createElement(
+          'p',
+          { className: 'caption' },
+          this.capitalizeFirstLetter(this.props.caption)
+        ) : null,
+        React.createElement('iframe', { src: this.props.src, className: 'result-item' })
+      );
     }
   }]);
 
