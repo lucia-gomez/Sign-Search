@@ -15,9 +15,9 @@ import youtube from "../private-keys";
 
 const SOURCES = Object.freeze({
   SPREAD_THE_SIGN: 'Spread the Sign',
+  SMART_SIGN_DICTIONARY: 'SmartSign Dictionary',
   LIFEPRINT: 'Lifeprint',
   SIGNING_SAVVY: 'Signing Savvy',
-  SMART_SIGN_DICTIONARY: 'SmartSign Dictionary',
 })
 const MEDIA_TYPE = Object.freeze({
   GIF: 0,
@@ -52,32 +52,14 @@ export async function search(history) {
 
 async function searchSources(input, results, history) {
   for (const source of Object.values(SOURCES)) {
-    let response;
     const query = getQuery(input, source);
 
     try {
-      if (source === SOURCES.SMART_SIGN_DICTIONARY) {
-        await $.ajax({
-          url: getQueryCORSProxy("https://youtube.googleapis.com/youtube/v3/search"),
-          type: "get",
-          data: {
-            key: youtube,
-            part: "snippet",
-            channelId: "UCACxqsL_FA-gMD2fwil7ZXA",
-            q: input,
-            order: 'relevance',
-            type: 'video',
-            maxResults: 10,
-          },
-          success: data => {
-            response = data;
-          }
-        });
-      } else {
-        response = await makeRequest(getQueryCORSProxy(query), 'document')
-      }
+      const responseType = getSourceResponseType(source);
+      const response = await makeRequest(getQueryCORSProxy(query), responseType)
       const [media, relatedSigns] = await parseMedia(response, source, input)
-      await selectAndRenderMedia(media, source, query, results)
+      const linkToSource = getLinkForSource(source, query, input)
+      await selectAndRenderMedia(media, source, linkToSource, results)
       selectAndRenderRelatedSigns(relatedSigns, input, source, results, history)
     }
     catch (err) { }
@@ -105,7 +87,7 @@ function getQuery(input, source) {
     case SOURCES.SIGNING_SAVVY:
       return 'https://www.signingsavvy.com/sign/' + input
     case SOURCES.SMART_SIGN_DICTIONARY:
-      return 'https://www.youtube.com/user/smartsigndictionary/search?query=' + input
+      return 'https://smart-sign-dictionary.herokuapp.com/query/' + input
     default:
       return ''
   }
@@ -118,6 +100,24 @@ function getQueryCORSProxy(query) {
 
 function removeCORSProxy(query) {
   return query.replace(CORS_PROXY, '')
+}
+
+function getLinkForSource(source, query, input) {
+  switch (source) {
+    case SOURCES.SMART_SIGN_DICTIONARY:
+      return 'https://www.youtube.com/user/smartsigndictionary/search?query=' + input;
+    default:
+      return query;
+  }
+}
+
+function getSourceResponseType(source) {
+  switch (source) {
+    case SOURCES.SMART_SIGN_DICTIONARY:
+      return 'json';
+    default:
+      return 'document';
+  }
 }
 
 async function makeRequest(query, responseType) {
@@ -176,7 +176,7 @@ async function parseMedia(response, source, input) {
       await parseSigningSavvy(media, relatedSigns, response, input)
       break;
     case SOURCES.SMART_SIGN_DICTIONARY:
-      parseSmartSignDictionary(media, relatedSigns, response)
+      await parseSmartSignDictionary(media, relatedSigns, response, input)
       break;
     default:
   }
@@ -310,25 +310,66 @@ function parseSigningSavvyMedia(media, response, input) {
   }
 }
 
-// result.items
-// item.snippet.title
-// item.id.videoId
-function parseSmartSignDictionary(media, relatedSigns, response) {
-  response.items.forEach(item => {
-    let caption = item.snippet.title;
-    const len = caption.length;
-    if (caption.substring(len - 3, len).toUpperCase() === "ASL") {
-      caption = caption.substring(0, len - 3);
+async function queryYouTubeIds(ids) {
+  return await $.ajax({
+    url: getQueryCORSProxy("https://youtube.googleapis.com/youtube/v3/videos"),
+    type: "get",
+    data: {
+      key: youtube,
+      part: "snippet",
+      id: ids,
+      maxResults: 10,
+    },
+    success: data => {
+      return data;
     }
-    media[MEDIA_TYPE.IFRAME].push({
-      src: `https://www.youtube.com/embed/${item.id.videoId}?`,
-      caption: caption,
-    });
-  })
+  });
+}
+
+function cleanSmartSignCaption(title) {
+  let caption = title;
+  const len = caption.length;
+  if (caption.substring(len - 3, len).toUpperCase() === "ASL") {
+    caption = caption.substring(0, len - 3);
+  }
+  return caption;
+}
+
+async function parseSmartSignDictionary(media, relatedSigns, response, input) {
+  const usedIds = [];
+  const ids = response.youtubeIds.map(id => id).join(",");
+  const videoData = await queryYouTubeIds(ids);
+
+  const hasExactMatch = videoData.items.map(item => {
+    return cleanSmartSignCaption(item.snippet.title) === input;
+  }).some(x => x);
+
+  videoData.items.forEach(item => {
+    const id = item.id;
+    const caption = cleanSmartSignCaption(item.snippet.title);
+    const captionWords = caption.split(",");
+    if (caption === input) {
+      // if the caption = the query, then it's good
+      usedIds.push(id);
+    } else if (!hasExactMatch && captionWords.includes(input)) {
+      // if we have no exact matches, use results that contain the query
+      usedIds.push(id);
+    }
+    if (usedIds.includes(id)) {
+      media[MEDIA_TYPE.IFRAME].push({
+        src: `https://www.youtube.com/embed/${id}?`,
+        caption: caption,
+      });
+    } else {
+      captionWords.forEach(word => {
+        relatedSigns.push({ name: word, url: '' });
+      })
+    }
+  });
   return [media, relatedSigns];
 }
 
-async function selectAndRenderMedia(media, source, query, results) {
+async function selectAndRenderMedia(media, source, linkToSource, results) {
   const children = []
   let hasVideo = false, hasGif = false
   if (media[MEDIA_TYPE.VIDEO].length > 0) {
@@ -339,7 +380,7 @@ async function selectAndRenderMedia(media, source, query, results) {
     hasVideo = true
   }
   if (media[MEDIA_TYPE.IFRAME].length > 0) {
-    let maxShow = 1;
+    let maxShow = source === SOURCES.SMART_SIGN_DICTIONARY ? 3 : 1;
     const iframes = media[MEDIA_TYPE.IFRAME].slice(0, maxShow);
     iframes.forEach(item => children.push(renderIFrame(item)));
     hasVideo = true
@@ -357,11 +398,11 @@ async function selectAndRenderMedia(media, source, query, results) {
     }
   }
   if (children.length > 0)
-    renderResultSection(source, query, children, results)
+    renderResultSection(source, linkToSource, children, results)
 }
 
-function renderResultSection(source, query, children, results) {
-  const section = <ResultSection title={source} link={query}>{children}</ResultSection>
+function renderResultSection(source, linkToSource, children, results) {
+  const section = <ResultSection title={source} link={linkToSource}>{children}</ResultSection>
   results.addChild(section)
 }
 
