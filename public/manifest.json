@@ -2,14 +2,11 @@
   "manifest_version": 2,
   "name": "Sign Search",
   "description": "Highlight a word on a page and lookup how to sign it in ASL",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "browser_action": {
     "default_popup": "index.html"
   },
-  "permissions": [
-    "storage",
-    "activeTab"
-  ],
+  "permissions": ["storage", "activeTab"],
   "content_security_policy": "script-src 'self' 'sha256-++srhNhFSKT0plG5tCc3J+LaJu4d/KvNNRW+tg3sFJ8='; object-src 'self'",
   "icons": {
     "32": "logo32.png",

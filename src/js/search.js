@@ -320,6 +320,9 @@ async function queryYouTubeIds(ids) {
       id: ids,
       maxResults: 10,
     },
+    headers: {
+      "X-Requested-With": 'XMLHttpRequest'
+    },
     success: data => {
       return data;
     }
